@@ -146,5 +146,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/admin/login/'
 LOGIN_REDIRECT_URL = '/pedidos/'
 LOGOUT_REDIRECT_URL = '/admin/login/'
-import os
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

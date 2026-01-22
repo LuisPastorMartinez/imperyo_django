@@ -15,8 +15,8 @@ sys.path.append(str(BASE_DIR))
 # ===========================================================
 
 SECRET_KEY = 'django-insecure-ypg6$bf(wje26r1+m%@7di2h9i)_#6^pee+fjwdx13x337iidy'
-DEBUG = True
-#DEBUG = False
+#DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ["*"]
 
 

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="card-custom p-4">
+
+    <!-- Menú de navegación -->
+    <nav class="navbar-nav-horizontal mb-4">
+        <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">Inicio</a>
+        <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">Posibles clientes</a>
+        <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">Gastos</a>
+        <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">Resumen</a>
+        <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">Configuración</a>
+    </nav>
+
+    <h2 class="mb-4">📋 Pedidos ({{ pedidos|length }})</h2>
+
+    <a href="{% url 'pedido_crear' %}" class="btn btn-primary mb-4">
+        ➕ Nuevo pedido
+    </a>
+
+    {% if pedidos %}
+    <div class="table-responsive">
+        <table class="table-home table table-bordered table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Club</th>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th>Productos</th>
+                    <th>Precio</th>
+                    <th>Precio factura</th>
+                    <th>Entrada</th>
+                    <th>Estimada</th>
+                    <th>Salida</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pedidos %}
+                <tr>
+                    <td><strong>{{ p.ID }}</strong></td>
+                    <td>{{ p.Club }}</td>
+                    <td>{{ p.Cliente }}</td>
+                    <td>{{ p.Telefono }}</td>
+                    <td>
+                        {% if p.productos %}
+                            {{ p.productos|length }} productos
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ p.Precio|default:"—" }}</td>
+                    <td>{{ p.Precio_factura|default:"—" }}</td>
+                    <td>{{ p.Fecha_entrada|default:"—" }}</td>
+                    <td>{{ p.Fecha_entrega_estimada|default:"—" }}</td>
+                    <td>{{ p.Fecha_finalizacion|default:"—" }}</td>
+                    <td class="estado-iconos">
+                        {{ p.Estados_iconos|safe }}
+                    </td>
+                    <td class="acciones">
+                        <a href="{% url 'pedido_detalle' p.ID %}" class="btn btn-info btn-sm me-1">Ver</a>
+                        <a href="{% url 'pedido_editar' p.ID %}" class="btn btn-warning btn-sm me-1">Editar</a>
+                        <a href="{% url 'pedido_eliminar' p.ID %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="alert alert-secondary">
+        No hay pedidos.
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

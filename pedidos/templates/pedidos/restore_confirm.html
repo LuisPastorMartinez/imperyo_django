@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="card-custom p-4">
+    <h2 class="mb-4">⚠️ Confirmar restauración</h2>
+
+    <div class="alert alert-warning">
+        <strong>¡Atención!</strong> Esta acción <strong>eliminará todos tus pedidos actuales</strong> y los reemplazará por los del archivo:
+        <br><code>{{ filename }}</code>
+        <br><br>
+        Se van a cargar <strong>{{ num_pedidos }} pedidos</strong>.
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="restore_confirm">
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">🔄 Sí, restaurar todo</button>
+            <a href="{% url 'configuracion' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.section-title {
+    color: var(--text-color);
+}
+</style>
+
+{% endblock %}

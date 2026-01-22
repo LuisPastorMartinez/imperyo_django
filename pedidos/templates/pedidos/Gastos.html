@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block contenido %}
+<div class="card-custom p-4">
+    <nav class="navbar-nav-horizontal mb-4">
+        <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">Inicio</a>
+        <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">Posibles clientes</a>
+        <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">Gastos</a>
+        <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">Resumen</a>
+        <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">Configuración</a>
+    </nav>
+    <h2>💰 Gastos</h2>
+    <p>Próximamente: registro de costos operativos, materiales, etc.</p>
+</div>
+{% endblock %}

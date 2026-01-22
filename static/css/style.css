@@ -1,0 +1,248 @@
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f4f4;
+    --text-color: #222222;
+    --border-color: #dddddd;
+    --card-color: #ffffff;
+    --btn-theme-bg: #6c757d;
+    --btn-theme-text: #ffffff;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --text-color: #f0f0f0;
+    --border-color: #333333;
+    --card-color: #1a1a1a;
+    --btn-theme-bg: #f0f0f0;
+    --btn-theme-text: #121212;
+}
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-color);
+}
+
+.card-custom {
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 25px;
+}
+
+input, textarea, select {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #00a6ff;
+    outline: none;
+}
+
+/* === Navbar personalizada === */
+.navbar {
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: 16px;
+}
+
+.logo-container {
+    width: 120px;
+    height: 110px;
+    position: relative;
+}
+
+.logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.logo-light { display: none; }
+
+[data-theme="light"] .logo-dark { display: none; }
+[data-theme="light"] .logo-light { display: block; }
+
+/* Título centrado – ¡4 veces más grande! */
+.navbar-title-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-weight: bold;
+    font-size: 5rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    line-height: 1;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 992px) {
+    .navbar-title-container {
+        font-size: 3.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-title-container {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-title-container {
+        font-size: 2rem;
+        white-space: normal;
+        width: 70%;
+    }
+}
+
+#themeToggle {
+    background: var(--btn-theme-bg);
+    color: var(--btn-theme-text) !important;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#themeToggle:hover {
+    opacity: 0.9;
+}
+
+/* === Tablas detalladas === */
+.table-detail {
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    table-layout: fixed;
+}
+
+.table-detail th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+}
+
+.table-detail td,
+.table-detail th {
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.table-detail input.form-control {
+    width: 100%;
+    height: 36px;
+    padding: 4px 6px;
+    font-size: 0.9rem;
+}
+
+.table-detail .subtotal {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* === Otros componentes === */
+.pedido-card {
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.estado-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    font-size: 0.8rem;
+}
+
+.footer-custom {
+    text-align: center;
+    opacity: 0.7;
+    padding: 20px 0;
+}
+
+/* === Tabla de inicio (home) – adaptable al tema === */
+.table-home {
+    background: var(--card-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.table-home th,
+.table-home td {
+    background: var(--card-color) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.table-home thead th {
+    background: var(--bg-secondary) !important;
+    font-weight: 600;
+}
+
+/* === Menú horizontal en home === */
+.navbar-nav-horizontal {
+    display: flex;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.navbar-nav-horizontal .nav-item {
+    padding: 6px 16px;
+    text-decoration: none;
+    color: var(--text-color);
+    border-radius: 6px;
+    transition: background 0.2s ease;
+    font-weight: 500;
+}
+
+.navbar-nav-horizontal .nav-item:hover {
+    background: var(--bg-secondary);
+}
+
+.navbar-nav-horizontal .nav-item.active {
+    background: var(--bg-secondary);
+    font-weight: bold;
+}
+
+/* === ÍCONO NATIVO DEL CALENDARIO - COLOR ADAPTATIVO === */
+input.input-fecha-calendario {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 12px;
+}
+
+/* Modo claro: ícono gris oscuro */
+input.input-fecha-calendario::-webkit-calendar-picker-indicator {
+    filter: invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(50%) contrast(100%);
+}
+
+/* Modo oscuro: ícono blanco */
+[data-theme="dark"] input.input-fecha-calendario::-webkit-calendar-picker-indicator {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+}

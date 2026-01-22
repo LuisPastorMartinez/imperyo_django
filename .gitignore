@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Entorno virtual
+venv/
+env/
+
+# Django
+staticfiles/
+
+# Configuración sensible
+*.env
+.env
+
+# Archivos del sistema
+Thumbs.db
+.DS_Store

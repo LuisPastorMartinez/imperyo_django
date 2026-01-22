@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ImperYo Sport</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Tu CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- PWA: Manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+
+    <!-- PWA: Theme color -->
+    <meta name="theme-color" content="#000000">
+
+    <!-- PWA: iPhone support (si algún día lo pruebas en iOS) -->
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+</head>
+
+<body>
+
+<nav class="navbar mb-4">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+
+        <!-- Logo -->
+        <a class="navbar-brand" href="/pedidos">
+            <div class="logo-container">
+                <img src="{% static 'logo_dark.png' %}" class="logo-dark" alt="ImperYo Sport">
+                <img src="{% static 'logo_light.png' %}" class="logo-light" alt="ImperYo Sport">
+            </div>
+        </a>
+
+        <!-- Título centrado -->
+        <div class="navbar-title-container">
+            <span class="navbar-title">ImperYo Sport</span>
+        </div>
+
+        <!-- Usuario + botón tema -->
+        <div class="d-flex align-items-center gap-3">
+            <span>{{ request.user.username }}</span>
+            <button id="themeToggle" class="btn btn-sm">
+                🌓 Tema
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    {% block contenido %}
+    {% endblock %}
+</div>
+
+<footer class="footer-custom">
+    ImperYo Sport © {{ now|date:"Y" }}
+</footer>
+
+<!-- Tema claro/oscuro -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+
+    const toggleButton = document.getElementById("themeToggle");
+    toggleButton.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        const next = current === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+    });
+});
+</script>
+
+<!-- PWA: Registrar Service Worker -->
+<script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("{% static 'serviceworker.js' %}");
+    }
+</script>
+
+</body>
+</html>

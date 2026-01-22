@@ -7,4 +7,4 @@ google-auth-httplib2
 pandas
 openpyxl
 firebase-admin
-
+python-dotenv

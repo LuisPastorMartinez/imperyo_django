@@ -1,2 +1,2 @@
-release: python manage.py collectstatic --noinput
 web: gunicorn imperyo.wsgi
+build: python manage.py collectstatic --noinput

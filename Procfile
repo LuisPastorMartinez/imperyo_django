@@ -1,2 +1,1 @@
-web: gunicorn imperyo.wsgi
-build: ./render-build.sh
+web: python manage.py collectstatic --noinput --clear && gunicorn imperyo.wsgi

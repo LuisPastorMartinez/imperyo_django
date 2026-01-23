@@ -14,11 +14,11 @@ sys.path.append(str(BASE_DIR))
 # SEGURIDAD
 # ===========================================================
 
+# ⚠️ Nunca expongas SECRET_KEY en producción → muévela a variable de entorno más adelante
 SECRET_KEY = 'django-insecure-ypg6$bf(wje26r1+m%@7di2h9i)_#6^pee+fjwdx13x337iidy'
-#DEBUG = True
-DEBUG = False
-ALLOWED_HOSTS = ["*"]
 
+DEBUG = False
+ALLOWED_HOSTS = ["imperyo-server.onrender.com"]  # ✅ Más seguro que ["*"]
 
 
 # ===========================================================
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← AÑADE ESTA LÍNEA
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ Sirve archivos estáticos en Render Free
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -61,14 +61,14 @@ ROOT_URLCONF = 'imperyo.urls'
 
 
 # ===========================================================
-# TEMPLATES  ✔ CORREGIDO ✔
+# TEMPLATES
 # ===========================================================
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / "templates",      # directorio de plantillas global
+            BASE_DIR / "templates",
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -103,14 +103,14 @@ DATABASES = {
 
 
 # ===========================================================
-# VALIDACIÓN DE PASSWORDS (limpio para desarrollo)
+# VALIDACIÓN DE PASSWORDS
 # ===========================================================
 
 AUTH_PASSWORD_VALIDATORS = []
 
 
 # ===========================================================
-# REGIÓN Y CONFIG LOCAL
+# LOCALIZACIÓN
 # ===========================================================
 
 LANGUAGE_CODE = 'es-es'
@@ -120,17 +120,19 @@ USE_TZ = True
 
 
 # ===========================================================
-# ARCHIVOS ESTÁTICOS (CSS / JS / IMÁGENES / LOGO)
+# ARCHIVOS ESTÁTICOS
 # ===========================================================
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',    # carpeta donde tienes el logo
+    BASE_DIR / 'static',
 ]
 
-# En producción activarías:
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# ❌ NO usar CompressedManifestStaticFilesStorage en Render Free
+# Se deja WhiteNoise en modo simple (por defecto)
 
 
 # ===========================================================
@@ -147,6 +149,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/admin/login/'
 LOGIN_REDIRECT_URL = '/pedidos/'
 LOGOUT_REDIRECT_URL = '/admin/login/'
-
-# Para WhiteNoise (servir estáticos en producción)
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -3,6 +3,7 @@ services:
   - type: web
     name: imperyo
     runtime: python
+    region: oregon
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn imperyo.wsgi"
     envVars:

@@ -1,0 +1,11 @@
+# render.yaml
+services:
+  - type: web
+    name: imperyo
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn imperyo.wsgi"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: imperyo.settings
+    releaseCommand: "python manage.py collectstatic --noinput --clear"

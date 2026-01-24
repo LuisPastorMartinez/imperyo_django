@@ -39,7 +39,17 @@
             </thead>
             <tbody>
                 {% for p in pedidos %}
-                <tr>
+                {% if "pendiente" in p.Estados %}
+                  <tr class="fila-pendiente">
+                {% elif "trabajo terminado" in p.Estados and "retirado" in p.Estados and "cobrado" in p.Estados %}
+                  <tr class="fila-finalizado">
+                {% elif "trabajo terminado" in p.Estados %}
+                  <tr class="fila-terminado-no-cobrado">
+                {% elif "fabricacion" in p.Estados %}
+                  <tr class="fila-fabricacion">
+                {% else %}
+                  <tr>
+                {% endif %}
                     <td><strong>{{ p.ID }}</strong></td>
                     <td>{{ p.Club }}</td>
                     <td>{{ p.Cliente }}</td>

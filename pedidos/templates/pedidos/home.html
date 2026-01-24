@@ -39,14 +39,14 @@
             </thead>
             <tbody>
                 {% for p in pedidos %}
-                {% if p.Pendiente %}
+                {% if p.pendiente %}
                     {% with row_class="fila-pendiente" %}
-                {% elif p.Terminado and p.Retirado and p.Cobrado %}
+                {% elif p.trabajo_terminado and p.retirado and p.cobrado %}
                     {% with row_class="fila-finalizado" %}
-                {% elif p.Terminado and not (p.Retirado and p.Cobrado) %}
-                    {% with row_class="fila-terminado-no-cobrado" %}
-                {% elif p.Fabricacion %}
+                {% elif p.fabricacion %}
                     {% with row_class="fila-fabricacion" %}
+                {% elif p.trabajo_terminado and not (p.retirado and p.cobrado) %}
+                    {% with row_class="fila-terminado-no-cobrado" %}
                 {% else %}
                     {% with row_class="" %}
                 {% endif %}

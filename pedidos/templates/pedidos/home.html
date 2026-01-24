@@ -39,7 +39,19 @@
             </thead>
             <tbody>
                 {% for p in pedidos %}
-                <tr>
+                {% if p.Pendiente %}
+                    {% with row_class="fila-pendiente" %}
+                {% elif p.Terminado and p.Retirado and p.Cobrado %}
+                    {% with row_class="fila-finalizado" %}
+                {% elif p.Terminado and not (p.Retirado and p.Cobrado) %}
+                    {% with row_class="fila-terminado-no-cobrado" %}
+                {% elif p.Fabricacion %}
+                    {% with row_class="fila-fabricacion" %}
+                {% else %}
+                    {% with row_class="" %}
+                {% endif %}
+
+                <tr class="{{ row_class }}">
                     <td><strong>{{ p.ID }}</strong></td>
                     <td>{{ p.Club }}</td>
                     <td>{{ p.Cliente }}</td>
@@ -65,6 +77,7 @@
                         <a href="{% url 'pedido_eliminar' p.ID %}" class="btn btn-danger btn-sm">Eliminar</a>
                     </td>
                 </tr>
+                {% endwith %}
                 {% endfor %}
             </tbody>
         </table>

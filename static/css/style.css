@@ -246,3 +246,16 @@ input.input-fecha-calendario::-webkit-calendar-picker-indicator {
 [data-theme="dark"] input.input-fecha-calendario::-webkit-calendar-picker-indicator {
     filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
 }
+/* Colores para filas según estado */
+.fila-pendiente {
+    background-color: #e6e6ff !important; /* Morado claro */
+}
+.fila-finalizado {
+    background-color: #d4edda !important; /* Verde suave */
+}
+.fila-fabricacion {
+    background-color: #cce5ff !important; /* Azul suave */
+}
+.fila-terminado-no-cobrado {
+    background-color: #fff3cd !important; /* Amarillo suave */
+}

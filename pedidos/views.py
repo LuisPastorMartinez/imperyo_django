@@ -271,6 +271,7 @@ def pedido_editar(request, pedido_id):
             "DestinoTotal": request.POST.get("DestinoTotal", "").strip(),
             "productos": productos,
             "total_pedido": total_pedido,
+            "Fecha_finalizacion": fecha_finalizacion,
         })
 
         return redirect("/pedidos/")

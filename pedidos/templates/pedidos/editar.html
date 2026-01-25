@@ -76,15 +76,11 @@
             </label>
         </div>
 
-        <!-- FECHA DE FINALIZACIÓN (CORREGIDO) -->
+        <!-- FECHA DE FINALIZACIÓN -->
         <div id="fecha-finalizacion-container" class="row mb-3" style="display:none;">
             <div class="col-md-6">
                 <label>Fecha de finalización</label>
-                <input type="date" 
-                       name="Fecha_finalizacion" 
-                       class="form-control" 
-                       value="{{ pedido.Fecha_finalizacion|date:'Y-m-d' }}" 
-                       readonly>
+                <input type="date" name="Fecha_finalizacion" class="form-control" value="{{ pedido.Fecha_finalizacion }}" readonly>
             </div>
         </div>
 
@@ -190,14 +186,203 @@
 
 </div>
 
-<!-- ESTILOS, SCRIPTS Y LÓGICA (SIN CAMBIOS) -->
 <style>
-...
+.section-title,
+.destino-label,
+.total-pedido {
+    color: var(--text-color);
+}
+
+.theme-select,
+.table-detail select.form-control,
+.table-detail input.form-control,
+.form-control {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.estados-box label {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.table-detail { 
+    table-layout: fixed; 
+    background: var(--card-color);
+    color: var(--text-color);
+}
+.table-detail td, .table-detail th { 
+    padding: 6px; 
+    vertical-align: middle;
+    background: var(--card-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+.table-detail thead th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+}
+.table-detail .subtotal { 
+    background: transparent !important; 
+    border: none !important; 
+    text-align: right; 
+    color: var(--text-color);
+}
 </style>
 
 <script>
-...
-// Tu JS se mantiene igual
+// Cargar productos iniciales desde Django
+const productosIniciales = {{ productos|safe }};
+let globalIndex = 0;
+
+function addProducto(producto = null) {
+    const selectProdOrig = document.querySelector("#plantilla-productos select");
+    const selectTejidoOrig = document.querySelector("#plantilla-tejidos select");
+    
+    if (!selectProdOrig || !selectTejidoOrig) return;
+
+    // Usamos un índice único pero temporal (no secuencial final)
+    const currentIndex = globalIndex++;
+    
+    const selectProd = selectProdOrig.cloneNode(true);
+    selectProd.name = `temp_producto_nombre_${currentIndex}`;
+    if (producto && producto.Producto !== undefined) {
+        selectProd.value = producto.Producto;
+    }
+
+    const selectTejido = selectTejidoOrig.cloneNode(true);
+    selectTejido.name = `temp_producto_tejido_${currentIndex}`;
+    if (producto && producto.tejido !== undefined) {
+        selectTejido.value = producto.tejido;
+    }
+
+    const cantidad = producto?.cantidad ?? 1;
+    const precio = producto?.precio_unitario ?? 0;
+    const subtotal = producto?.subtotal ?? 0;
+
+    const tabla = document.getElementById("productos-tabla");
+    const fila = document.createElement("tr");
+    fila.className = "producto-item";
+    fila.innerHTML = `
+        <td></td>
+        <td></td>
+        <td><input name="temp_producto_cantidad_${currentIndex}" class="cantidad form-control" type="number" min="1" step="1" value="${cantidad}"></td>
+        <td><input name="temp_producto_precio_${currentIndex}" class="precio form-control" type="number" min="0" step="0.01" value="${precio}"></td>
+        <td><input class="subtotal form-control" readonly value="${subtotal.toFixed(2)}"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); calcularTotales();">X</button></td>
+    `;
+    fila.cells[0].appendChild(selectProd);
+    fila.cells[1].appendChild(selectTejido);
+    tabla.appendChild(fila);
+}
+
+function calcularTotales() {
+    let total = 0;
+    const tabla = document.getElementById("productos-tabla");
+    tabla.querySelectorAll(".producto-item").forEach(row => {
+        const cant = parseFloat(row.querySelector(".cantidad").value) || 0;
+        const precio = parseFloat(row.querySelector(".precio").value) || 0;
+        const subtotal = cant * precio;
+        row.querySelector(".subtotal").value = subtotal.toFixed(2);
+        total += subtotal;
+    });
+    document.getElementById("totalPedido").innerText = total.toFixed(2) + "€";
+
+    const destino = document.getElementById("destinoTotal").value;
+    const precioInput = document.getElementById("precioInput");
+    const facturaInput = document.getElementById("facturaInput");
+    precioInput.value = "";
+    facturaInput.value = "";
+    if (destino === "precio") {
+        precioInput.value = total.toFixed(2);
+    } else if (destino === "precio_factura") {
+        facturaInput.value = total.toFixed(2);
+    }
+}
+
+function validarEstados() {
+    const chkTerminado = document.getElementById('estado-terminado');
+    const chkRetirado = document.getElementById('estado-retirado');
+    const chkCobrado = document.getElementById('estado-cobrado');
+    const contenedor = document.getElementById('fecha-finalizacion-container');
+
+    if (!chkTerminado?.checked) {
+        chkRetirado.checked = false;
+        chkRetirado.disabled = true;
+    } else {
+        chkRetirado.disabled = false;
+    }
+
+    const todos = chkTerminado?.checked && chkRetirado?.checked && chkCobrado?.checked;
+    contenedor.style.display = todos ? 'block' : 'none';
+}
+
+// ✨ NUEVO: Renombra todos los campos antes de enviar
+function renombrarCamposAntesDeEnviar() {
+    const filas = document.querySelectorAll("#productos-tabla .producto-item");
+    filas.forEach((fila, newIndex) => {
+        const selectProd = fila.querySelector("select[name^='temp_producto_nombre_']");
+        const selectTejido = fila.querySelector("select[name^='temp_producto_tejido_']");
+        const inputCantidad = fila.querySelector("input[name^='temp_producto_cantidad_']");
+        const inputPrecio = fila.querySelector("input[name^='temp_producto_precio_']");
+
+        if (selectProd) selectProd.name = `producto_nombre_${newIndex}`;
+        if (selectTejido) selectTejido.name = `producto_tejido_${newIndex}`;
+        if (inputCantidad) inputCantidad.name = `producto_cantidad_${newIndex}`;
+        if (inputPrecio) inputPrecio.name = `producto_precio_${newIndex}`;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Cargar productos existentes
+    productosIniciales.forEach(p => addProducto(p));
+    calcularTotales();
+
+    // Lógica de estados
+    document.querySelectorAll('.estado-exclusivo').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('.estado-exclusivo').forEach(other => {
+                    if (other !== this) other.checked = false;
+                });
+            }
+            validarEstados();
+        });
+    });
+
+    const chkRetirado = document.getElementById('estado-retirado');
+    const chkCobrado = document.getElementById('estado-cobrado');
+    if (chkRetirado) {
+        chkRetirado.addEventListener('change', function() {
+            const chkTerminado = document.getElementById('estado-terminado');
+            if (this.checked && !chkTerminado?.checked) {
+                alert("No se puede marcar 'retirado' sin que el trabajo esté terminado.");
+                this.checked = false;
+            }
+            validarEstados();
+        });
+    }
+    if (chkCobrado) {
+        chkCobrado.addEventListener('change', validarEstados);
+    }
+    validarEstados();
+});
+
+// Eventos
+document.getElementById("destinoTotal")?.addEventListener("change", calcularTotales);
+document.addEventListener("input", e => {
+    if (e.target.classList.contains("cantidad") || e.target.classList.contains("precio")) {
+        calcularTotales();
+    }
+});
+
+// ✨ Intercepta el envío para renumerar
+document.getElementById("formPedido")?.addEventListener("submit", function(e) {
+    renombrarCamposAntesDeEnviar();
+});
 </script>
 
 {% endblock %}

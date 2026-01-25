@@ -80,7 +80,7 @@
         <div id="fecha-finalizacion-container" class="row mb-3" style="display:none;">
             <div class="col-md-6">
                 <label>Fecha de finalización</label>
-                <input type="date" name="Fecha_finalizacion" class="form-control" value="{{ pedido.Fecha_finalizacion }}" readonly>
+                <input type="date" name="Fecha_finalizacion" class="form-control" value="{{ pedido.Fecha_finalizacion|default:'' }}" readonly>
             </div>
         </div>
 
@@ -244,7 +244,6 @@ function addProducto(producto = null) {
     
     if (!selectProdOrig || !selectTejidoOrig) return;
 
-    // Usamos un índice único pero temporal (no secuencial final)
     const currentIndex = globalIndex++;
     
     const selectProd = selectProdOrig.cloneNode(true);
@@ -309,6 +308,7 @@ function validarEstados() {
     const chkCobrado = document.getElementById('estado-cobrado');
     const contenedor = document.getElementById('fecha-finalizacion-container');
 
+    // Deshabilitar 'retirado' si no está 'terminado'
     if (!chkTerminado?.checked) {
         chkRetirado.checked = false;
         chkRetirado.disabled = true;
@@ -316,11 +316,12 @@ function validarEstados() {
         chkRetirado.disabled = false;
     }
 
-    const todos = chkTerminado?.checked && chkRetirado?.checked && chkCobrado?.checked;
-    contenedor.style.display = todos ? 'block' : 'none';
+    // Mostrar fecha de finalización solo si los tres están marcados
+    const todosMarcados = chkTerminado?.checked && chkRetirado?.checked && chkCobrado?.checked;
+    contenedor.style.display = todosMarcados ? 'block' : 'none';
 }
 
-// ✨ NUEVO: Renombra todos los campos antes de enviar
+// Renombra campos antes de enviar
 function renombrarCamposAntesDeEnviar() {
     const filas = document.querySelectorAll("#productos-tabla .producto-item");
     filas.forEach((fila, newIndex) => {
@@ -341,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
     productosIniciales.forEach(p => addProducto(p));
     calcularTotales();
 
-    // Lógica de estados
+    // Configurar eventos para exclusividad en estados iniciales
     document.querySelectorAll('.estado-exclusivo').forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             if (this.checked) {
@@ -353,6 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Eventos para retirado y cobrado
     const chkRetirado = document.getElementById('estado-retirado');
     const chkCobrado = document.getElementById('estado-cobrado');
     if (chkRetirado) {
@@ -368,10 +370,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (chkCobrado) {
         chkCobrado.addEventListener('change', validarEstados);
     }
+
+    // ✅ ¡IMPORTANTE! Llamar validarEstados() al final para reflejar estado inicial
     validarEstados();
 });
 
-// Eventos
+// Eventos para cálculos
 document.getElementById("destinoTotal")?.addEventListener("change", calcularTotales);
 document.addEventListener("input", e => {
     if (e.target.classList.contains("cantidad") || e.target.classList.contains("precio")) {
@@ -379,7 +383,7 @@ document.addEventListener("input", e => {
     }
 });
 
-// ✨ Intercepta el envío para renumerar
+// Intercepta envío
 document.getElementById("formPedido")?.addEventListener("submit", function(e) {
     renombrarCamposAntesDeEnviar();
 });

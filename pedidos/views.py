@@ -256,6 +256,15 @@ def pedido_editar(request, pedido_id):
         except ValueError:
             pago_adelantado = 0.0
 
+        # 🔹 NUEVO: Lógica para Fecha_finalizacion (solo la primera vez)
+        estados = request.POST.getlist("Estados")
+        estados_set = set(estados)
+        tres_estados = {"trabajo terminado", "retirado", "cobrado"}
+        fecha_finalizacion = pedido.get("Fecha_finalizacion")  # conservar si ya existe
+        if fecha_finalizacion is None and tres_estados.issubset(estados_set):
+            fecha_finalizacion = date.today().isoformat()
+        # Si ya existe, no se modifica
+
         ref.update({
             "Cliente": request.POST.get("Cliente", "").strip(),
             "Telefono": request.POST.get("Telefono", "").strip(),
@@ -263,7 +272,7 @@ def pedido_editar(request, pedido_id):
             "Fecha_entrega_estimada": request.POST.get("Fecha_entrega_estimada", "").strip(),
             "Fecha_entrada": request.POST.get("Fecha_entrada", "").strip(),
             "Comentarios": request.POST.get("Comentarios", "").strip(),
-            "Estados": request.POST.getlist("Estados"),
+            "Estados": estados,
             "Precio": request.POST.get("Precio", "").strip(),
             "Precio_factura": request.POST.get("Precio_factura", "").strip(),
             "Forma_pago": request.POST.get("Forma_pago", "").strip(),

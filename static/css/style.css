@@ -259,3 +259,9 @@ input.input-fecha-calendario::-webkit-calendar-picker-indicator {
 .fila-terminado-no-cobrado {
     background-color: #fff3cd !important; /* Amarillo suave */
 }
+/* Forzar visibilidad SIEMPRE para el campo de fecha finalización */
+#fecha-finalizacion-container input[readonly] {
+    color: var(--text-color) !important;
+    background: var(--bg-secondary) !important;
+    opacity: 1 !important;
+}

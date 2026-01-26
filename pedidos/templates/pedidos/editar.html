@@ -40,7 +40,7 @@
         <!-- COMENTARIOS -->
         <div class="mb-4">
             <label>Comentarios</label>
-            <textarea name="Comentarios" class="form-control" rows="3">{{ pedido.Comentarios }}</textarea>
+            <textarea name="Comentarios" class="form-control" rows="3" placeholder="Notas sobre lo hablado con el cliente...">{{ pedido.Comentarios }}</textarea>
         </div>
 
         <!-- ESTADOS -->
@@ -59,19 +59,15 @@
                     {% if "fabricacion" in pedido.Estados %}checked{% endif %}> fabricacion
             </label>
             <label>
-                <input type="checkbox" name="Estados" value="trabajo empezado"
-                    {% if "trabajo empezado" in pedido.Estados %}checked{% endif %}> trabajo empezado
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="trabajo terminado" class="estado-exclusivo"
+                <input type="checkbox" name="Estados" value="trabajo terminado" class="estado-exclusivo" id="estado-terminado"
                     {% if "trabajo terminado" in pedido.Estados %}checked{% endif %}> trabajo terminado
             </label>
             <label>
-                <input type="checkbox" name="Estados" value="cobrado"
+                <input type="checkbox" name="Estados" value="cobrado" id="estado-cobrado"
                     {% if "cobrado" in pedido.Estados %}checked{% endif %}> cobrado
             </label>
             <label>
-                <input type="checkbox" name="Estados" value="retirado"
+                <input type="checkbox" name="Estados" value="retirado" id="estado-retirado"
                     {% if "retirado" in pedido.Estados %}checked{% endif %}> retirado
             </label>
             <label>
@@ -80,9 +76,313 @@
             </label>
         </div>
 
-        <!-- (RESTO DEL ARCHIVO SIN CAMBIOS) -->
-        {{ block.super }}
+        <!-- FECHA DE FINALIZACIÓN -->
+        <div id="fecha-finalizacion-container" class="row mb-3" style="display:none;">
+            <div class="col-md-6">
+                <label>Fecha de finalización</label>
+                <input type="date" name="Fecha_finalizacion" class="form-control" value="{{ pedido.Fecha_finalizacion }}" readonly>
+            </div>
+        </div>
+
+        <!-- PRODUCTOS -->
+        <h5 class="section-title mb-2">Productos</h5>
+
+        <table class="table table-bordered table-detail">
+            <colgroup>
+                <col style="width:30%">
+                <col style="width:20%">
+                <col style="width:10%">
+                <col style="width:15%">
+                <col style="width:15%">
+                <col style="width:10%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Tejido</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="productos-tabla">
+                <!-- Los productos se cargarán aquí vía JS -->
+            </tbody>
+        </table>
+
+        <button type="button" class="btn btn-secondary mt-3" onclick="addProducto()">➕ Añadir producto</button>
+
+        <!-- FACTURACIÓN Y PAGO -->
+        <h5 class="section-title mt-4">Facturación</h5>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Precio</label>
+                <input type="number" step="0.01" name="Precio" id="precioInput" class="form-control" value="{{ pedido.Precio|stringformat:'g' }}">
+            </div>
+            <div class="col-md-6">
+                <label>Precio factura</label>
+                <input type="number" step="0.01" name="Precio_factura" id="facturaInput" class="form-control" value="{{ pedido.Precio_factura|stringformat:'g' }}">
+            </div>
+        </div>
+
+        <div class="row mt-3 align-items-end">
+            <div class="col-md-4">
+                <h4 class="total-pedido mb-0">
+                    Total pedido: <span id="totalPedido">0.00€</span>
+                </h4>
+            </div>
+            <div class="col-md-4">
+                <label>Forma de pago</label>
+                <select name="Forma_pago" class="form-select theme-select">
+                    <option value="">— Seleccionar —</option>
+                    <option value="transferencia" {% if pedido.Forma_pago == "transferencia" %}selected{% endif %}>Transferencia</option>
+                    <option value="bizum" {% if pedido.Forma_pago == "bizum" %}selected{% endif %}>Bizum</option>
+                    <option value="efectivo" {% if pedido.Forma_pago == "efectivo" %}selected{% endif %}>Efectivo</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>Pago adelantado</label>
+                <input type="number" step="0.01" name="Pago_adelantado" class="form-control" 
+                       value="{{ pedido.Pago_adelantado|stringformat:'g' }}" placeholder="0.00">
+            </div>
+        </div>
+
+        <div class="mt-3" style="max-width:260px;">
+            <label class="fw-bold destino-label">Enviar total automáticamente a:</label>
+            <select id="destinoTotal" name="DestinoTotal" class="form-select theme-select">
+                <option value="">— No aplicar —</option>
+                <option value="precio" {% if pedido.DestinoTotal == "precio" %}selected{% endif %}>Precio</option>
+                <option value="precio_factura" {% if pedido.DestinoTotal == "precio_factura" %}selected{% endif %}>Precio factura</option>
+            </select>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary">Guardar</button>
+            <a href="/pedidos/" class="btn btn-secondary">Cancelar</a>
+        </div>
+
+    </form>
+
+    <!-- Plantillas ocultas -->
+    <div id="plantilla-productos" style="display:none;">
+        <select class="form-control">
+            <option value="">— Seleccionar producto —</option>
+            {% for prod in productos_disponibles %}
+            <option value="{{ prod }}">{{ prod }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div id="plantilla-tejidos" style="display:none;">
+        <select class="form-control">
+            <option value="">— Seleccionar tejido —</option>
+            {% for tejido in tejidos_disponibles %}
+            <option value="{{ tejido }}">{{ tejido }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
 </div>
+
+<style>
+.section-title,
+.destino-label,
+.total-pedido {
+    color: var(--text-color);
+}
+
+.theme-select,
+.table-detail select.form-control,
+.table-detail input.form-control,
+.form-control {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.estados-box label {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.table-detail { 
+    table-layout: fixed; 
+    background: var(--card-color);
+    color: var(--text-color);
+}
+.table-detail td, .table-detail th { 
+    padding: 6px; 
+    vertical-align: middle;
+    background: var(--card-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+.table-detail thead th {
+    background: var(--bg-secondary);
+    font-weight: 600;
+}
+.table-detail .subtotal { 
+    background: transparent !important; 
+    border: none !important; 
+    text-align: right; 
+    color: var(--text-color);
+}
+</style>
+
+<script>
+// Cargar productos iniciales desde Django
+const productosIniciales = {{ productos|safe }};
+let globalIndex = 0;
+
+function addProducto(producto = null) {
+    const selectProdOrig = document.querySelector("#plantilla-productos select");
+    const selectTejidoOrig = document.querySelector("#plantilla-tejidos select");
+    
+    if (!selectProdOrig || !selectTejidoOrig) return;
+
+    // Usamos un índice único pero temporal (no secuencial final)
+    const currentIndex = globalIndex++;
+    
+    const selectProd = selectProdOrig.cloneNode(true);
+    selectProd.name = `temp_producto_nombre_${currentIndex}`;
+    if (producto && producto.Producto !== undefined) {
+        selectProd.value = producto.Producto;
+    }
+
+    const selectTejido = selectTejidoOrig.cloneNode(true);
+    selectTejido.name = `temp_producto_tejido_${currentIndex}`;
+    if (producto && producto.tejido !== undefined) {
+        selectTejido.value = producto.tejido;
+    }
+
+    const cantidad = producto?.cantidad ?? 1;
+    const precio = producto?.precio_unitario ?? 0;
+    const subtotal = producto?.subtotal ?? 0;
+
+    const tabla = document.getElementById("productos-tabla");
+    const fila = document.createElement("tr");
+    fila.className = "producto-item";
+    fila.innerHTML = `
+        <td></td>
+        <td></td>
+        <td><input name="temp_producto_cantidad_${currentIndex}" class="cantidad form-control" type="number" min="1" step="1" value="${cantidad}"></td>
+        <td><input name="temp_producto_precio_${currentIndex}" class="precio form-control" type="number" min="0" step="0.01" value="${precio}"></td>
+        <td><input class="subtotal form-control" readonly value="${subtotal.toFixed(2)}"></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); calcularTotales();">X</button></td>
+    `;
+    fila.cells[0].appendChild(selectProd);
+    fila.cells[1].appendChild(selectTejido);
+    tabla.appendChild(fila);
+}
+
+function calcularTotales() {
+    let total = 0;
+    const tabla = document.getElementById("productos-tabla");
+    tabla.querySelectorAll(".producto-item").forEach(row => {
+        const cant = parseFloat(row.querySelector(".cantidad").value) || 0;
+        const precio = parseFloat(row.querySelector(".precio").value) || 0;
+        const subtotal = cant * precio;
+        row.querySelector(".subtotal").value = subtotal.toFixed(2);
+        total += subtotal;
+    });
+    document.getElementById("totalPedido").innerText = total.toFixed(2) + "€";
+
+    const destino = document.getElementById("destinoTotal").value;
+    const precioInput = document.getElementById("precioInput");
+    const facturaInput = document.getElementById("facturaInput");
+    precioInput.value = "";
+    facturaInput.value = "";
+    if (destino === "precio") {
+        precioInput.value = total.toFixed(2);
+    } else if (destino === "precio_factura") {
+        facturaInput.value = total.toFixed(2);
+    }
+}
+
+function validarEstados() {
+    const chkTerminado = document.getElementById('estado-terminado');
+    const chkRetirado = document.getElementById('estado-retirado');
+    const chkCobrado = document.getElementById('estado-cobrado');
+    const contenedor = document.getElementById('fecha-finalizacion-container');
+
+    if (!chkTerminado?.checked) {
+        chkRetirado.checked = false;
+        chkRetirado.disabled = true;
+    } else {
+        chkRetirado.disabled = false;
+    }
+
+    const todos = chkTerminado?.checked && chkRetirado?.checked && chkCobrado?.checked;
+    contenedor.style.display = todos ? 'block' : 'none';
+}
+
+// ✨ NUEVO: Renombra todos los campos antes de enviar
+function renombrarCamposAntesDeEnviar() {
+    const filas = document.querySelectorAll("#productos-tabla .producto-item");
+    filas.forEach((fila, newIndex) => {
+        const selectProd = fila.querySelector("select[name^='temp_producto_nombre_']");
+        const selectTejido = fila.querySelector("select[name^='temp_producto_tejido_']");
+        const inputCantidad = fila.querySelector("input[name^='temp_producto_cantidad_']");
+        const inputPrecio = fila.querySelector("input[name^='temp_producto_precio_']");
+
+        if (selectProd) selectProd.name = `producto_nombre_${newIndex}`;
+        if (selectTejido) selectTejido.name = `producto_tejido_${newIndex}`;
+        if (inputCantidad) inputCantidad.name = `producto_cantidad_${newIndex}`;
+        if (inputPrecio) inputPrecio.name = `producto_precio_${newIndex}`;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Cargar productos existentes
+    productosIniciales.forEach(p => addProducto(p));
+    calcularTotales();
+
+    // Lógica de estados
+    document.querySelectorAll('.estado-exclusivo').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.querySelectorAll('.estado-exclusivo').forEach(other => {
+                    if (other !== this) other.checked = false;
+                });
+            }
+            validarEstados();
+        });
+    });
+
+    const chkRetirado = document.getElementById('estado-retirado');
+    const chkCobrado = document.getElementById('estado-cobrado');
+    if (chkRetirado) {
+        chkRetirado.addEventListener('change', function() {
+            const chkTerminado = document.getElementById('estado-terminado');
+            if (this.checked && !chkTerminado?.checked) {
+                alert("No se puede marcar 'retirado' sin que el trabajo esté terminado.");
+                this.checked = false;
+            }
+            validarEstados();
+        });
+    }
+    if (chkCobrado) {
+        chkCobrado.addEventListener('change', validarEstados);
+    }
+    validarEstados();
+});
+
+// Eventos
+document.getElementById("destinoTotal")?.addEventListener("change", calcularTotales);
+document.addEventListener("input", e => {
+    if (e.target.classList.contains("cantidad") || e.target.classList.contains("precio")) {
+        calcularTotales();
+    }
+});
+
+// ✨ Intercepta el envío para renumerar
+document.getElementById("formPedido")?.addEventListener("submit", function(e) {
+    renombrarCamposAntesDeEnviar();
+});
+</script>
 
 {% endblock %}

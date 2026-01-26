@@ -18,7 +18,7 @@
     <!-- PWA: Theme color -->
     <meta name="theme-color" content="#000000">
 
-    <!-- PWA: iPhone support (si algún día lo pruebas en iOS) -->
+    <!-- PWA: iPhone support -->
     <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
 </head>
 
@@ -50,10 +50,12 @@
     </div>
 </nav>
 
-<div class="container">
+<!--  ⭐ CAMBIO IMPORTANTE: pantalla completa ⭐ -->
+<div class="container-fluid p-2" style="max-width: 100%;">
     {% block contenido %}
     {% endblock %}
 </div>
+<!--  ⭐ FIN CAMBIO ⭐ -->
 
 <footer class="footer-custom">
     ImperYo Sport © {{ now|date:"Y" }}

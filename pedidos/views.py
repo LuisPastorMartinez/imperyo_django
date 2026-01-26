@@ -20,6 +20,7 @@ def pedidos_home(request):
         "Nuevo": "🟢",
         "diseño": "🎨",
         "fabricacion": "🧵",
+        "trabajo empezado": "⚙️",
         "trabajo terminado": "✅",
         "cobrado": "💰",
         "retirado": "🚚",
@@ -154,8 +155,9 @@ def pedido_crear(request):
 
         return redirect("/pedidos/")
 
-    estados = ["Nuevo", "diseño", "fabricacion", "pendiente",
-               "cobrado", "retirado", "trabajo terminado"]
+   estados = ["Nuevo", "diseño", "fabricacion", "trabajo empezado",
+           "pendiente", "cobrado"]
+
 
     return render(request, "pedidos/crear.html", {
         "pedido_id": nuevo_id,
@@ -285,8 +287,9 @@ def pedido_editar(request, pedido_id):
 
         return redirect("/pedidos/")
 
-    estados = ["Nuevo", "diseño", "fabricacion", "pendiente",
-               "cobrado", "retirado", "trabajo terminado"]
+    estados = ["Nuevo", "diseño", "fabricacion", "trabajo empezado",
+           "pendiente", "cobrado", "retirado", "trabajo terminado"]
+
 
     return render(request, "pedidos/editar.html", {
         "pedido_id": pedido_id,

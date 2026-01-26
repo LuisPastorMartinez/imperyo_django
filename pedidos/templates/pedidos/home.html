@@ -37,23 +37,33 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for p in pedidos %}
-                {% if "pendiente" in p.Estados %}
-                  <tr class="fila-pendiente">
+
+                {#  ⭐ NUEVA LÓGICA DE COLORES POR ESTADO ⭐ #}
+                {% if "fabricacion" in p.Estados %}
+                    <tr class="fila-fabricacion">
+
+                {% elif "pendiente" in p.Estados %}
+                    <tr class="fila-pendiente">
+
                 {% elif "trabajo terminado" in p.Estados and "retirado" in p.Estados and "cobrado" in p.Estados %}
-                  <tr class="fila-finalizado">
+                    <tr class="fila-finalizado">
+
                 {% elif "trabajo terminado" in p.Estados %}
-                  <tr class="fila-terminado-no-cobrado">
-                {% elif "fabricacion" in p.Estados %}
-                  <tr class="fila-fabricacion">
+                    <tr class="fila-terminado-no-cobrado">
+
                 {% else %}
-                  <tr>
+                    <tr>
                 {% endif %}
+                {#  ⭐ FIN LÓGICA DE COLORES ⭐ #}
+
                     <td><strong>{{ p.ID }}</strong></td>
                     <td>{{ p.Club }}</td>
                     <td>{{ p.Cliente }}</td>
                     <td>{{ p.Telefono }}</td>
+
                     <td>
                         {% if p.productos %}
                             {{ p.productos|length }} productos
@@ -61,20 +71,25 @@
                             —
                         {% endif %}
                     </td>
+
                     <td>{{ p.Precio|default:"—" }}</td>
                     <td>{{ p.Precio_factura|default:"—" }}</td>
                     <td>{{ p.Fecha_entrada|default:"—" }}</td>
                     <td>{{ p.Fecha_entrega_estimada|default:"—" }}</td>
                     <td>{{ p.Fecha_finalizacion|default:"—" }}</td>
+
                     <td class="estado-iconos">
                         {{ p.Estados_iconos|safe }}
                     </td>
+
                     <td class="acciones">
                         <a href="{% url 'pedido_detalle' p.ID %}" class="btn btn-info btn-sm me-1">Ver</a>
                         <a href="{% url 'pedido_editar' p.ID %}" class="btn btn-warning btn-sm me-1">Editar</a>
                         <a href="{% url 'pedido_eliminar' p.ID %}" class="btn btn-danger btn-sm">Eliminar</a>
                     </td>
+
                 </tr>
+
                 {% endfor %}
             </tbody>
         </table>

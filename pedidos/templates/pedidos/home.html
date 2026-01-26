@@ -81,12 +81,28 @@
                     <td class="estado-iconos">
                         {{ p.Estados_iconos|safe }}
                     </td>
+<td class="acciones">
 
-                    <td class="acciones">
-                        <a href="{% url 'pedido_detalle' p.ID %}" class="btn btn-info btn-sm me-1">Ver</a>
-                        <a href="{% url 'pedido_editar' p.ID %}" class="btn btn-warning btn-sm me-1">Editar</a>
-                        <a href="{% url 'pedido_eliminar' p.ID %}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
+    <!-- ✔ SIEMPRE visible -->
+    <a href="{% url 'pedido_detalle' p.ID %}"
+       class="btn btn-info btn-sm btn-ver">
+       Ver
+    </a>
+
+    <!-- ❌ OCULTAR EN MÓVIL -->
+    <a href="{% url 'pedido_editar' p.ID %}"
+       class="btn btn-warning btn-sm btn-desktop">
+       Editar
+    </a>
+
+    <a href="{% url 'pedido_eliminar' p.ID %}"
+       class="btn btn-danger btn-sm btn-desktop">
+       Eliminar
+    </a>
+
+</td>
+
+                    
 
                 </tr>
 

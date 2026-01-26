@@ -281,3 +281,17 @@ input.input-fecha-calendario::-webkit-calendar-picker-indicator {
 .table-home tr.fila-terminado-no-cobrado td {
     background-color: #fff3cd !important;
 }
+/* Mostrar SOLO el botón "Ver" en móvil */
+@media (max-width: 768px) {
+
+    .btn-desktop {
+        display: none !important;
+    }
+
+    .btn-ver {
+        width: 100%;
+        text-align: center;
+        font-size: 1.1rem;
+        padding: 10px 0;
+    }
+}

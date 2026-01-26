@@ -40,22 +40,29 @@
             <span class="navbar-title">ImperYo Sport</span>
         </div>
 
-        <!-- Usuario + botón tema -->
+        <!-- Usuario + tema + logout -->
         <div class="d-flex align-items-center gap-3">
+
             <span>{{ request.user.username }}</span>
+
             <button id="themeToggle" class="btn btn-sm">
                 🌓 Tema
             </button>
+
+            <!-- ⭐ BOTÓN NUEVO: CERRAR SESIÓN ⭐ -->
+            <a href="/logout/" class="btn btn-danger btn-sm">
+                🔒 Cerrar sesión
+            </a>
+
         </div>
     </div>
 </nav>
 
-<!--  ⭐ CAMBIO IMPORTANTE: pantalla completa ⭐ -->
+<!--  ⭐ Pantalla completa ⭐ -->
 <div class="container-fluid p-2" style="max-width: 100%;">
     {% block contenido %}
     {% endblock %}
 </div>
-<!--  ⭐ FIN CAMBIO ⭐ -->
 
 <footer class="footer-custom">
     ImperYo Sport © {{ now|date:"Y" }}
@@ -79,9 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- PWA: Registrar Service Worker -->
 <script>
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("{% static 'serviceworker.js' %}");
-    }
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("{% static 'serviceworker.js' %}");
+}
 </script>
 
 </body>

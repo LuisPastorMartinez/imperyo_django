@@ -295,3 +295,16 @@ input.input-fecha-calendario::-webkit-calendar-picker-indicator {
         padding: 10px 0;
     }
 }
+/* SOLO en móviles esconder Editar y Eliminar */
+@media (max-width: 768px) {
+    .btn-desktop {
+        display: none !important;
+    }
+
+    .btn-ver {
+        width: 100%;
+        text-align: center;
+        font-size: 1.2rem;
+        padding: 12px 0;
+    }
+}

@@ -269,22 +269,24 @@ input.input-fecha-calendario::-webkit-calendar-picker-indicator {
     background: var(--bg-secondary) !important;
     opacity: 1 !important;
 }
+
 /* Sobrescribir colores de fila */
 .table-home tr.fila-pendiente td {
     background-color: #e6e6ff !important;
 }
-
 .table-home tr.fila-finalizado td {
     background-color: #d4edda !important;
 }
-
 .table-home tr.fila-fabricacion td {
     background-color: #cce5ff !important;
 }
-
+.table-home tr.fila-trabajo-iniciado td {
+    background-color: #ffe0cc !important; /* Naranja suave - OBRAS 🚧 */
+}
 .table-home tr.fila-terminado-no-cobrado td {
     background-color: #fff3cd !important;
 }
+
 /* Mostrar SOLO el botón "Ver" en móvil */
 @media (max-width: 768px) {
 

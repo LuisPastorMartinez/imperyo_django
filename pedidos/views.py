@@ -421,7 +421,8 @@ def resumen(request):
     pedidos = sorted(pedidos, key=lambda x: int(x["ID"]), reverse=True)
 
     # 👇 AÑADIDO: lista de todos los estados para el filtro
-   estados_todos = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "trabajo terminado", "cobrado", "retirado", "pendiente"]
+  estados_todos = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "trabajo terminado", "cobrado", "retirado", "pendiente"]
+
     return render(request, "pedidos/resumen.html", {
         "pedidos": pedidos,
         "estados_todos": estados_todos

@@ -1,151 +1,110 @@
 {% extends "base.html" %}
 {% block contenido %}
+<h2>Pedido #{{ pedido_id }}</h2>
 
-<div class="card-custom p-4">
-
-    <h2 class="mb-4">Pedido #{{ pedido_id }}</h2>
-
-    <!-- DATOS DEL CLIENTE -->
+<!-- DATOS DEL CLIENTE -->
+<div class="card-custom mb-4">
     <h5 class="section-title mb-3">Datos del cliente</h5>
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <strong>Cliente:</strong> {{ pedido.Cliente }}
-        </div>
-        <div class="col-md-4">
-            <strong>Teléfono:</strong> {{ pedido.Telefono }}
-        </div>
-        <div class="col-md-4">
-            <strong>Club:</strong> {{ pedido.Club }}
-        </div>
-    </div>
-
-    <!-- FECHAS -->
-    <h5 class="section-title mb-3">Fechas</h5>
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <strong>Fecha de entrada:</strong> {{ pedido.Fecha_entrada|default:"—" }}
-        </div>
-        <div class="col-md-4">
-            <strong>Fecha estimada de entrega:</strong> {{ pedido.Fecha_entrega_estimada|default:"—" }}
-        </div>
-        <div class="col-md-4">
-            <strong>Fecha de finalización:</strong> {{ pedido.Fecha_finalizacion|default:"—" }}
-        </div>
-    </div>
-
-    <!-- COMENTARIOS -->
-    <h5 class="section-title mb-3">Comentarios</h5>
-    <p>{{ pedido.Comentarios|default:"Sin comentarios" }}</p>
-
-    <!-- ESTADOS -->
-    <h5 class="section-title mb-3">Estados</h5>
-    <div class="estados-box mb-3">
-        {% for estado in pedido.Estados %}
-        <span class="estado-pill">{{ estado }}</span>
-        {% endfor %}
-        {% if not pedido.Estados %}
-        <span class="estado-pill">—</span>
-        {% endif %}
-    </div>
-
-    <!-- PRODUCTOS -->
-    <h5 class="section-title mb-3">Productos</h5>
-    {% if pedido.productos %}
-    <table class="table table-bordered table-detail">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Tejido</th>
-                <th>Cantidad</th>
-                <th>Precio unitario</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in pedido.productos %}
-            <tr>
-                <td>{{ p.Producto|default:"—" }}</td>
-                <td>{{ p.tejido|default:"—" }}</td>
-                <td>{{ p.cantidad|floatformat:0 }}</td>
-                <td>{{ p.precio_unitario|floatformat:2 }} €</td>
-                <td>{{ p.subtotal|floatformat:2 }} €</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p class="text-muted">No hay productos en este pedido.</p>
-    {% endif %}
-
-    <!-- FACTURACIÓN Y PAGO -->
-    <h5 class="section-title mt-4">Facturación y pago</h5>
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <strong>Total del pedido:</strong> {{ pedido.total_pedido|floatformat:2 }} €
-        </div>
-        <div class="col-md-4">
-            <strong>Precio factura:</strong> {{ pedido.Precio_factura|default:"0.00"|floatformat:2 }} €
-        </div>
-        <div class="col-md-4">
-            <strong>Pago adelantado:</strong> {{ pedido.Pago_adelantado|default:"0.00"|floatformat:2 }} €
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <strong>Forma de pago:</strong> 
-            {% if pedido.Forma_pago %}
-                {{ pedido.Forma_pago|title }}
-            {% else %}
-                —
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- BOTONES -->
-    <div class="mt-4 d-flex gap-2">
-        <a href="{% url 'pedido_editar' pedido_id %}" class="btn btn-warning">Editar</a>
-        <a href="{% url 'pedido_eliminar' pedido_id %}" class="btn btn-danger">Eliminar</a>
-        <a href="/pedidos/" class="btn btn-secondary">Volver</a>
-    </div>
-
+    <p><strong>Cliente:</strong> {{ pedido.Cliente }}</p>
+    <p><strong>Teléfono:</strong> {{ pedido.Telefono }}</p>
+    <p><strong>Club:</strong> {{ pedido.Club }}</p>
 </div>
 
-<style>
-.section-title {
-    color: var(--text-color);
-    margin-top: 1.5rem;
-}
+<!-- FECHAS -->
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">Fechas</h5>
+    <p><strong>Fecha de entrada:</strong> {{ pedido.Fecha_entrada|default:"—" }}</p>
+    <p><strong>Fecha estimada de entrega:</strong> {{ pedido.Fecha_entrega_estimada|default:"—" }}</p>
+    <p><strong>Fecha de finalización:</strong> {{ pedido.Fecha_finalizacion|default:"—" }}</p>
+</div>
 
-.estado-pill {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 20px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    font-size: 0.85rem;
-    margin-right: 8px;
-    margin-bottom: 6px;
-    color: var(--text-color);
-}
+<!-- COMENTARIOS -->
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">Comentarios</h5>
+    <p>{{ pedido.Comentarios|default:"Sin comentarios" }}</p>
+</div>
 
-.table-detail {
-    background: var(--card-color);
-    color: var(--text-color);
-    border-color: var(--border-color);
-}
+<!-- ESTADOS -->
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">Estados</h5>
+    {% if pedido.Estados %}
+        {% for estado in pedido.Estados %}
+            {% if estado == "trabajo iniciado" %}
+                <span class="estado-pill">🚧 {{ estado }}</span>
+            {% elif estado == "Nuevo" %}
+                <span class="estado-pill">🟢 {{ estado }}</span>
+            {% elif estado == "diseño" %}
+                <span class="estado-pill">🎨 {{ estado }}</span>
+            {% elif estado == "fabricacion" %}
+                <span class="estado-pill">🧵 {{ estado }}</span>
+            {% elif estado == "trabajo terminado" %}
+                <span class="estado-pill">✅ {{ estado }}</span>
+            {% elif estado == "cobrado" %}
+                <span class="estado-pill">💰 {{ estado }}</span>
+            {% elif estado == "retirado" %}
+                <span class="estado-pill">🚚 {{ estado }}</span>
+            {% elif estado == "pendiente" %}
+                <span class="estado-pill">⏳ {{ estado }}</span>
+            {% else %}
+                <span class="estado-pill">{{ estado }}</span>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>—</p>
+    {% endif %}
+</div>
 
-.table-detail th,
-.table-detail td {
-    background: var(--card-color) !important;
-    color: var(--text-color) !important;
-    border-color: var(--border-color) !important;
-}
+<!-- PRODUCTOS -->
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">Productos</h5>
+    {% if pedido.productos %}
+        <table class="table-detail">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Tejido</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pedido.productos %}
+                <tr>
+                    <td>{{ p.Producto|default:"—" }}</td>
+                    <td>{{ p.tejido|default:"—" }}</td>
+                    <td>{{ p.cantidad|floatformat:0 }}</td>
+                    <td>{{ p.precio_unitario|floatformat:2 }} €</td>
+                    <td>{{ p.subtotal|floatformat:2 }} €</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay productos en este pedido.</p>
+    {% endif %}
+</div>
 
-.table-detail thead th {
-    background: var(--bg-secondary) !important;
-    font-weight: 600;
-}
-</style>
+<!-- FACTURACIÓN Y PAGO -->
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">Facturación y pago</h5>
+    <p><strong>Total del pedido:</strong> {{ pedido.total_pedido|floatformat:2 }} €</p>
+    <p><strong>Precio factura:</strong> {{ pedido.Precio_factura|default:"0.00"|floatformat:2 }} €</p>
+    <p><strong>Pago adelantado:</strong> {{ pedido.Pago_adelantado|default:"0.00"|floatformat:2 }} €</p>
+    <p><strong>Forma de pago:</strong> 
+        {% if pedido.Forma_pago %}
+            {{ pedido.Forma_pago|title }}
+        {% else %}
+            —
+        {% endif %}
+    </p>
+</div>
+
+<!-- BOTONES DE ACCIÓN -->
+<div class="d-flex gap-2">
+    <a href="{% url 'pedido_editar' pedido_id %}" class="btn btn-primary">✏️ Editar</a>
+    <a href="{% url 'pedido_eliminar' pedido_id %}" class="btn btn-danger">🗑️ Eliminar</a>
+    <a href="/pedidos/" class="btn btn-secondary">⬅️ Volver</a>
+</div>
 
 {% endblock %}

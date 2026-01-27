@@ -43,46 +43,50 @@
             <textarea name="Comentarios" class="form-control" rows="3" placeholder="Notas sobre lo hablado con el cliente...">{{ pedido.Comentarios }}</textarea>
         </div>
 
-        <!-- ESTADOS -->
-        <h5 class="section-title mb-2">Estados</h5>
-        <div class="estados-box mb-4">
-            <label>
-                <input type="checkbox" name="Estados" value="Nuevo" class="estado-exclusivo"
-                    {% if "Nuevo" in pedido.Estados %}checked{% endif %}> Nuevo
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="diseño" class="estado-exclusivo"
-                    {% if "diseño" in pedido.Estados %}checked{% endif %}> diseño
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="fabricacion" class="estado-exclusivo"
-                    {% if "fabricacion" in pedido.Estados %}checked{% endif %}> fabricacion
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="trabajo terminado" class="estado-exclusivo" id="estado-terminado"
-                    {% if "trabajo terminado" in pedido.Estados %}checked{% endif %}> trabajo terminado
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="cobrado" id="estado-cobrado"
-                    {% if "cobrado" in pedido.Estados %}checked{% endif %}> cobrado
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="retirado" id="estado-retirado"
-                    {% if "retirado" in pedido.Estados %}checked{% endif %}> retirado
-            </label>
-            <label>
-                <input type="checkbox" name="Estados" value="pendiente"
-                    {% if "pendiente" in pedido.Estados %}checked{% endif %}> pendiente
-            </label>
-        </div>
+       <!-- ESTADOS -->
+<h5 class="section-title mb-2">Estados</h5>
+<div class="estados-box mb-4">
+    <label>
+        <input type="checkbox" name="Estados" value="Nuevo" class="estado-exclusivo"
+            {% if "Nuevo" in pedido.Estados %}checked{% endif %}> Nuevo
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="diseño" class="estado-exclusivo"
+            {% if "diseño" in pedido.Estados %}checked{% endif %}> diseño
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="fabricacion" class="estado-exclusivo"
+            {% if "fabricacion" in pedido.Estados %}checked{% endif %}> fabricacion
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="trabajo iniciado" class="estado-exclusivo"
+            {% if "trabajo iniciado" in pedido.Estados %}checked{% endif %}> trabajo iniciado
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="trabajo terminado" class="estado-exclusivo" id="estado-terminado"
+            {% if "trabajo terminado" in pedido.Estados %}checked{% endif %}> trabajo terminado
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="pendiente"
+            {% if "pendiente" in pedido.Estados %}checked{% endif %}> pendiente
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="cobrado" id="estado-cobrado"
+            {% if "cobrado" in pedido.Estados %}checked{% endif %}> cobrado
+    </label>
+    <label>
+        <input type="checkbox" name="Estados" value="retirado" id="estado-retirado"
+            {% if "retirado" in pedido.Estados %}checked{% endif %}> retirado
+    </label>
+</div>
 
-        <!-- FECHA DE FINALIZACIÓN -->
-        <div id="fecha-finalizacion-container" class="row mb-3" style="display:none;">
-            <div class="col-md-6">
-                <label>Fecha de finalización</label>
-                <input type="date" name="Fecha_finalizacion" class="form-control" value="{{ pedido.Fecha_finalizacion }}" readonly>
-            </div>
-        </div>
+<!-- FECHA DE FINALIZACIÓN -->
+<div id="fecha-finalizacion-container" class="row mb-3" style="display:none;">
+    <div class="col-md-6">
+        <label>Fecha de finalización</label>
+        <input type="date" name="Fecha_finalizacion" class="form-control" value="{{ pedido.Fecha_finalizacion }}" readonly>
+    </div>
+</div>
 
         <!-- PRODUCTOS -->
         <h5 class="section-title mb-2">Productos</h5>

@@ -20,6 +20,7 @@ def pedidos_home(request):
         "Nuevo": "🟢",
         "diseño": "🎨",
         "fabricacion": "🧵",
+        "trabajo iniciado": "🚧",
         "trabajo terminado": "✅",
         "cobrado": "💰",
         "retirado": "🚚",
@@ -154,8 +155,7 @@ def pedido_crear(request):
 
         return redirect("/pedidos/")
 
-    estados = ["Nuevo", "diseño", "fabricacion", "pendiente",
-               "cobrado", "retirado", "trabajo terminado"]
+    estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado",                              "retirado", "trabajo terminado"]
 
     return render(request, "pedidos/crear.html", {
         "pedido_id": nuevo_id,
@@ -285,8 +285,7 @@ def pedido_editar(request, pedido_id):
 
         return redirect("/pedidos/")
 
-    estados = ["Nuevo", "diseño", "fabricacion", "pendiente",
-               "cobrado", "retirado", "trabajo terminado"]
+    estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado", "retirado", "trabajo terminado"]
 
     return render(request, "pedidos/editar.html", {
         "pedido_id": pedido_id,
@@ -395,6 +394,7 @@ def resumen(request):
         "Nuevo": "🟢",
         "diseño": "🎨",
         "fabricacion": "🧵",
+        "trabajo iniciado": "🚧",
         "trabajo terminado": "✅",
         "cobrado": "💰",
         "retirado": "🚚",
@@ -421,8 +421,7 @@ def resumen(request):
     pedidos = sorted(pedidos, key=lambda x: int(x["ID"]), reverse=True)
 
     # 👇 AÑADIDO: lista de todos los estados para el filtro
-    estados_todos = ["Nuevo", "diseño", "fabricacion", "trabajo terminado", "cobrado", "retirado", "pendiente"]
-
+   estados_todos = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "trabajo terminado", "cobrado", "retirado", "pendiente"]
     return render(request, "pedidos/resumen.html", {
         "pedidos": pedidos,
         "estados_todos": estados_todos

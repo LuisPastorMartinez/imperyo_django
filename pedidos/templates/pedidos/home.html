@@ -43,20 +43,18 @@
 
                 {#  ⭐ NUEVA LÓGICA DE COLORES POR ESTADO ⭐ #}
                 {% if "fabricacion" in p.Estados %}
-                    <tr class="fila-fabricacion">
-
-                {% elif "pendiente" in p.Estados %}
-                    <tr class="fila-pendiente">
-
-                {% elif "trabajo terminado" in p.Estados and "retirado" in p.Estados and "cobrado" in p.Estados %}
-                    <tr class="fila-finalizado">
-
-                {% elif "trabajo terminado" in p.Estados %}
-                    <tr class="fila-terminado-no-cobrado">
-
-                {% else %}
-                    <tr>
-                {% endif %}
+    <tr class="fila-fabricacion">
+{% elif "trabajo iniciado" in p.Estados %}
+    <tr class="fila-trabajo-iniciado">
+{% elif "pendiente" in p.Estados %}
+    <tr class="fila-pendiente">
+{% elif "trabajo terminado" in p.Estados and "retirado" in p.Estados and "cobrado" in p.Estados %}
+    <tr class="fila-finalizado">
+{% elif "trabajo terminado" in p.Estados %}
+    <tr class="fila-terminado-no-cobrado">
+{% else %}
+    <tr>
+{% endif %}
                 {#  ⭐ FIN LÓGICA DE COLORES ⭐ #}
 
                     <td><strong>{{ p.ID }}</strong></td>

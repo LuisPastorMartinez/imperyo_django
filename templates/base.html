@@ -1,65 +1,95 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ImperYo Sport</title>
-    {% load static %}
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Tu CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- PWA: Manifest -->
     <link rel="manifest" href="{% static 'manifest.json' %}">
+
+    <!-- PWA: Theme color -->
+    <meta name="theme-color" content="#000000">
+
+    <!-- PWA: iPhone support -->
     <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
-    <meta name="theme-color" content="#ffffff">
 </head>
+
 <body>
-    <div class="container-fluid">
-        <!-- Header -->
-        <header class="header mb-4">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="logo">
-                    <img src="{% static 'logo_light.png' %}" alt="ImperYo Sport Logo" class="logo-img">
-                    <h1 class="logo-text">ImperYo Sport</h1>
-                </div>
-                
-                <div class="user-info">
-                    {% if request.user.is_authenticated %}
-                    <span class="user-name">👤 {{ request.user.username }}</span>
-                    <a href="/logout/" class="btn btn-sm btn-outline-secondary ms-2">🔒 Cerrar sesión</a>
-                    {% endif %}
-                </div>
-            </div>
-        </header>
 
-        <!-- Contenido principal -->
-        <main class="main-content">
-            {% block contenido %}
-            {% endblock %}
-        </main>
+<nav class="navbar mb-4">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
 
-        <!-- Footer -->
-        <footer class="footer mt-5 py-3">
-            <div class="text-center">
-                <p class="mb-0">ImperYo Sport © {{ now|date:"Y" }}</p>
+        <!-- Logo -->
+        <a class="navbar-brand" href="/pedidos">
+            <div class="logo-container">
+                <img src="{% static 'logo_dark.png' %}" class="logo-dark" alt="ImperYo Sport">
+                <img src="{% static 'logo_light.png' %}" class="logo-light" alt="ImperYo Sport">
             </div>
-        </footer>
+        </a>
+
+        <!-- Título centrado -->
+        <div class="navbar-title-container">
+            <span class="navbar-title">ImperYo Sport</span>
+        </div>
+
+        <!-- Usuario + tema + logout -->
+        <div class="d-flex align-items-center gap-3">
+
+            <span>{{ request.user.username }}</span>
+
+            <button id="themeToggle" class="btn btn-sm">
+                🌓 Tema
+            </button>
+
+            <!-- ⭐ BOTÓN NUEVO: CERRAR SESIÓN ⭐ -->
+            <a href="/logout/" class="btn btn-danger btn-sm">
+                🔒 Cerrar sesión
+            </a>
+
+        </div>
     </div>
+</nav>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Tema oscuro/claro
-        const toggleTheme = () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-        };
+<!--  ⭐ Pantalla completa ⭐ -->
+<div class="container-fluid p-2" style="max-width: 100%;">
+    {% block contenido %}
+    {% endblock %}
+</div>
 
-        // Cargar tema guardado
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
-        });
-    </script>
+<footer class="footer-custom">
+    ImperYo Sport © {{ now|date:"Y" }}
+</footer>
+
+<!-- Tema claro/oscuro -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+
+    const toggleButton = document.getElementById("themeToggle");
+    toggleButton.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        const next = current === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+    });
+});
+</script>
+
+<!-- PWA: Registrar Service Worker -->
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("{% static 'serviceworker.js' %}");
+}
+</script>
+
 </body>
 </html>

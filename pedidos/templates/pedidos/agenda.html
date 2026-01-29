@@ -22,45 +22,41 @@
 
 <h2>📅 Agenda</h2>
 
-<!-- BOTÓN PARA NUEVA CITA -->
-<button type="button" class="btn btn-primary mb-4" onclick="toggleFormulario()">➕ Nueva cita</button>
+<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario-cita').style.display='block'">➕ Nueva cita</button>
 
-<!-- FORMULARIO PARA CREAR/EDITAR CITA -->
-<div id="formulario-cita" class="card-custom mb-4" style="display: none;">
+<div id="formulario-cita" class="card-custom mb-4" style="display:none;">
     <h5 class="section-title mb-3">📝 Nueva cita</h5>
-    
-    <form method="POST" action="{% url 'agenda_guardar' %}" id="form-cita">
+    <form method="POST" action="{% url 'agenda_guardar' %}">
         {% csrf_token %}
-        
-        <input type="hidden" name="cita_id" id="cita_id" value="">
+        <input type="hidden" name="cita_id">
         
         <div class="row mb-3">
             <div class="col-md-6">
                 <label>Fecha *</label>
-                <input type="date" name="Fecha" id="Fecha" class="form-control input-fecha-calendario" required>
+                <input type="date" name="Fecha" class="form-control" required>
             </div>
             <div class="col-md-6">
                 <label>Hora *</label>
-                <input type="time" name="Hora" id="Hora" class="form-control" required>
+                <input type="time" name="Hora" class="form-control" required>
             </div>
         </div>
         
         <div class="row mb-3">
             <div class="col-md-6">
                 <label>Cliente *</label>
-                <input type="text" name="Cliente" id="Cliente" class="form-control" placeholder="Nombre del cliente" required>
+                <input type="text" name="Cliente" class="form-control" placeholder="Nombre del cliente" required>
             </div>
             <div class="col-md-6">
                 <label>Teléfono *</label>
-                <input type="tel" name="Telefono" id="Telefono" class="form-control" placeholder="Teléfono de contacto" required>
+                <input type="tel" name="Telefono" class="form-control" placeholder="Teléfono" required>
             </div>
         </div>
         
         <div class="row mb-3">
             <div class="col-md-6">
                 <label>Tipo *</label>
-                <select name="Tipo" id="Tipo" class="form-control" required>
-                    <option value="">— Seleccionar tipo —</option>
+                <select name="Tipo" class="form-control" required>
+                    <option value="">— Seleccionar —</option>
                     <option value="Nuevo cliente">Nuevo cliente</option>
                     <option value="Cliente existente">Cliente existente</option>
                     <option value="Seguimiento">Seguimiento</option>
@@ -69,29 +65,25 @@
             </div>
             <div class="col-md-6">
                 <label>Club</label>
-                <input type="text" name="Club" id="Club" class="form-control" placeholder="Nombre del club (opcional)">
+                <input type="text" name="Club" class="form-control" placeholder="Nombre del club">
             </div>
         </div>
         
-        <div class="row mb-3">
-            <div class="col-12">
-                <label>Notas</label>
-                <textarea name="Notas" id="Notas" class="form-control" rows="4" placeholder="Detalles de la cita, qué necesita el cliente, etc."></textarea>
-            </div>
+        <div class="mb-3">
+            <label>Notas</label>
+            <textarea name="Notas" class="form-control" rows="3" placeholder="Detalles de la cita"></textarea>
         </div>
         
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">💾 Guardar cita</button>
-            <button type="button" class="btn btn-secondary" onclick="toggleFormulario()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('formulario-cita').style.display='none'">Cancelar</button>
         </div>
     </form>
 </div>
 
-<!-- TABLA DE CITAS -->
 {% if citas %}
 <div class="card-custom mb-4">
-    <h5 class="section-title mb-3">📋 Citas programadas ({{ citas|length }})</h5>
-    
+    <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
     <table class="table-home table table-striped">
         <thead>
             <tr>
@@ -113,33 +105,10 @@
                 <td>{{ c.Cliente|default:"—" }}</td>
                 <td>{{ c.Telefono|default:"—" }}</td>
                 <td>{{ c.Club|default:"—" }}</td>
+                <td>{{ c.Tipo|default:"—" }}</td>
+                <td>{{ c.Notas|default:"—" }}</td>
                 <td>
-                    {% if c.Tipo == "Nuevo cliente" %}
-                        👤 {{ c.Tipo }}
-                    {% elif c.Tipo == "Cliente existente" %}
-                        🔄 {{ c.Tipo }}
-                    {% elif c.Tipo == "Seguimiento" %}
-                        📞 {{ c.Tipo }}
-                    {% elif c.Tipo == "Reunión" %}
-                        💼 {{ c.Tipo }}
-                    {% else %}
-                        {{ c.Tipo }}
-                    {% endif %}
-                </td>
-                <td>{{ c.Notas|default:"Sin notas"|truncatechars:50 }}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-warning btn-editar" 
-                        data-id="{{ c.ID }}" 
-                        data-fecha="{{ c.Fecha }}" 
-                        data-hora="{{ c.Hora }}" 
-                        data-cliente="{{ c.Cliente }}" 
-                        data-telefono="{{ c.Telefono }}" 
-                        data-tipo="{{ c.Tipo }}" 
-                        data-club="{{ c.Club }}" 
-                        data-notas="{{ c.Notas }}">
-                        ✏️ Editar
-                    </button>
-                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta cita?')">🗑️ Eliminar</a>
+                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
                 </td>
             </tr>
             {% endfor %}
@@ -148,60 +117,12 @@
 </div>
 {% else %}
 <div class="card-custom">
-    <p>📭 No hay citas programadas.</p>
+    <p>📭 No hay citas programadas</p>
 </div>
 {% endif %}
 
-<div class="d-flex gap-2">
+<div class="d-flex gap-2 mt-4">
     <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
 </div>
-
-<!-- SCRIPT PARA EDITAR CITAS -->
-<script>
-function toggleFormulario() {
-    const form = document.getElementById('formulario-cita');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    
-    // Limpiar formulario si se cierra
-    if (form.style.display === 'none') {
-        document.getElementById('form-cita').reset();
-        document.getElementById('cita_id').value = '';
-        document.querySelector('.section-title').textContent = '📝 Nueva cita';
-    }
-}
-
-// Editar cita
-document.querySelectorAll('.btn-editar').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const id = this.getAttribute('data-id');
-        const fecha = this.getAttribute('data-fecha');
-        const hora = this.getAttribute('data-hora');
-        const cliente = this.getAttribute('data-cliente');
-        const telefono = this.getAttribute('data-telefono');
-        const tipo = this.getAttribute('data-tipo');
-        const club = this.getAttribute('data-club');
-        const notas = this.getAttribute('data-notas');
-        
-        // Rellenar formulario
-        document.getElementById('cita_id').value = id;
-        document.getElementById('Fecha').value = fecha || '';
-        document.getElementById('Hora').value = hora || '';
-        document.getElementById('Cliente').value = cliente || '';
-        document.getElementById('Telefono').value = telefono || '';
-        document.getElementById('Tipo').value = tipo || '';
-        document.getElementById('Club').value = club || '';
-        document.getElementById('Notas').value = notas || '';
-        
-        // Cambiar título
-        document.querySelector('.section-title').textContent = '✏️ Editar cita';
-        
-        // Mostrar formulario
-        document.getElementById('formulario-cita').style.display = 'block';
-        
-        // Scroll al formulario
-        document.getElementById('formulario-cita').scrollIntoView({ behavior: 'smooth' });
-    });
-});
-</script>
 
 {% endblock %}

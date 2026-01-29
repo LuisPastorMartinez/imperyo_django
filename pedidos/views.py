@@ -539,19 +539,30 @@ def agenda(request):
         docs = citas_ref.stream()
         
         citas = []
+        citas_hoy = 0
+        hoy = date.today().isoformat()
+        
         for doc in docs:
             data = doc.to_dict()
             data["ID"] = doc.id
             citas.append(data)
+            
+            # Contar citas de hoy
+            if data.get("Fecha") == hoy:
+                citas_hoy += 1
         
         # Ordenar por fecha y hora (más cercanas primero)
         citas = sorted(citas, key=lambda x: (x.get("Fecha", ""), x.get("Hora", "")))
     except Exception as e:
         # Si hay error (colección no existe), mostrar lista vacía
         citas = []
+        citas_hoy = 0
         print(f"Error al cargar citas: {e}")
     
-    return render(request, "pedidos/agenda.html", {"citas": citas})
+    return render(request, "pedidos/agenda.html", {
+        "citas": citas,
+        "citas_hoy_count": citas_hoy  # 👈 Añadido contador
+    })
 
 @login_required
 def agenda_guardar(request):

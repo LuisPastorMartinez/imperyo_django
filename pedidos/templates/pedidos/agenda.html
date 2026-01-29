@@ -3,17 +3,34 @@
 
 <!-- Menú de navegación -->
 <nav class="navbar-nav-horizontal mb-4">
-    <a href="{% url 'pedidos_home' %}" class="nav-item">🏠 Inicio</a>
-    <a href="{% url 'posibles_clientes' %}" class="nav-item">👥 Posibles clientes</a>
-    <a href="{% url 'gastos' %}" class="nav-item">💰 Gastos</a>
-    <a href="{% url 'resumen' %}" class="nav-item">📊 Resumen</a>
-    <a href="{% url 'configuracion' %}" class="nav-item">⚙️ Configuración</a>
+    {% if request.resolver_match.url_name != 'pedidos_home' %}
+    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'gastos' %}
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'configuracion' %}
+    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
+    {% endif %}
 </nav>
 
 <h2>📅 Agenda</h2>
 
-<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario').style.display='block'">➕ Nueva cita</button>
+<!-- Botón Nueva cita con badge -->
+<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario').style.display='block'">
+    ➕ Nueva cita
+    {% if citas_hoy_count > 0 %}
+        <span class="badge bg-danger ms-2">{{ citas_hoy_count }} hoy</span>
+    {% endif %}
+</button>
 
+<!-- Formulario -->
 <div id="formulario" class="card-custom mb-4" style="display:none;">
     <h5 class="section-title mb-3">📝 Nueva cita</h5>
     <form method="POST" action="{% url 'agenda_guardar' %}">
@@ -72,6 +89,7 @@
     </form>
 </div>
 
+<!-- Tabla de citas -->
 {% if citas %}
 <div class="card-custom mb-4">
     <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
@@ -102,7 +120,7 @@
                     <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
                 </td>
             </tr>
-            {% endfor %}  <!-- ✅ ¡CORREGIDO! Tag endfor añadido -->
+            {% endfor %}
         </tbody>
     </table>
 </div>

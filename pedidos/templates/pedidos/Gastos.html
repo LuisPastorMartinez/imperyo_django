@@ -1,14 +1,41 @@
 {% extends "base.html" %}
 {% block contenido %}
-<div class="card-custom p-4">
-    <nav class="navbar-nav-horizontal mb-4">
-        <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">Inicio</a>
-        <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">Posibles clientes</a>
-        <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">Gastos</a>
-        <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">Resumen</a>
-        <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">Configuración</a>
-    </nav>
-    <h2>💰 Gastos</h2>
-    <p>Próximamente: registro de costos operativos, materiales, etc.</p>
+
+<!-- Menú de navegación -->
+<nav class="navbar-nav-horizontal mb-4">
+    {% if request.resolver_match.url_name != 'pedidos_home' %}
+    <a href="{% url 'pedidos_home' %}" class="nav-item">🏠 Inicio</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'agenda' %}
+    <a href="{% url 'agenda' %}" class="nav-item">📅 Agenda</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    <a href="{% url 'posibles_clientes' %}" class="nav-item">👥 Posibles clientes</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item">📊 Resumen</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'configuracion' %}
+    <a href="{% url 'configuracion' %}" class="nav-item">⚙️ Configuración</a>
+    {% endif %}
+</nav>
+
+<h2>💰 Gastos</h2>
+
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">Próximamente...</h5>
+    <p>Esta sección permitirá gestionar los gastos del negocio.</p>
+    <p>Funcionalidades planeadas:</p>
+    <ul>
+        <li>📊 Registrar gastos mensuales (alquiler, luz, agua, etc.)</li>
+        <li>📈 Ver estadísticas de gastos</li>
+        <li>📁 Categorizar gastos por tipo</li>
+        <li>💰 Comparar gastos con ingresos</li>
+    </ul>
 </div>
+
+<div class="d-flex gap-2">
+    <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+</div>
+
 {% endblock %}

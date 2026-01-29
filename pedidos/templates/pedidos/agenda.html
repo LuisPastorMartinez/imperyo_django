@@ -12,6 +12,16 @@
 
 <h2>📅 Agenda</h2>
 
-<button type="button" class="btn btn-primary mb-4">➕ Nueva cita</button>
+<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario').style.display='block'">➕ Nueva cita</button>
+
+<div id="formulario" class="card-custom mb-4" style="display:none;">
+    <h5 class="section-title mb-3">📝 Nueva cita</h5>
+    <form method="POST" action="{% url 'agenda_guardar' %}">
+        {% csrf_token %}
+        <input type="text" name="Cliente" placeholder="Cliente" required>
+        <button type="submit">💾 Guardar</button>
+        <button type="button" onclick="document.getElementById('formulario').style.display='none'">Cancelar</button>
+    </form>
+</div>
 
 {% endblock %}

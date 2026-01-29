@@ -18,10 +18,80 @@
     <h5 class="section-title mb-3">📝 Nueva cita</h5>
     <form method="POST" action="{% url 'agenda_guardar' %}">
         {% csrf_token %}
-        <input type="text" name="Cliente" placeholder="Cliente" required>
-        <button type="submit">💾 Guardar</button>
-        <button type="button" onclick="document.getElementById('formulario').style.display='none'">Cancelar</button>
+        
+        <input type="hidden" name="cita_id" value="">
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Fecha *</label>
+                <input type="date" name="Fecha" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label>Hora *</label>
+                <input type="time" name="Hora" class="form-control" required>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Cliente *</label>
+                <input type="text" name="Cliente" class="form-control" placeholder="Nombre del cliente" required>
+            </div>
+            <div class="col-md-6">
+                <label>Teléfono *</label>
+                <input type="tel" name="Telefono" class="form-control" placeholder="Teléfono" required>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Tipo *</label>
+                <select name="Tipo" class="form-control" required>
+                    <option value="">— Seleccionar —</option>
+                    <option value="Nuevo cliente">Nuevo cliente</option>
+                    <option value="Cliente existente">Cliente existente</option>
+                    <option value="Seguimiento">Seguimiento</option>
+                    <option value="Reunión">Reunión</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label>Club</label>
+                <input type="text" name="Club" class="form-control" placeholder="Nombre del club">
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label>Notas</label>
+            <textarea name="Notas" class="form-control" rows="3" placeholder="Detalles de la cita"></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('formulario').style.display='none'">Cancelar</button>
+        </div>
     </form>
 </div>
 
-{% endblock %}
+{% if citas %}
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
+    <table class="table-home table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Club</th>
+                <th>Tipo</th>
+                <th>Notas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in citas %}
+            <tr>
+                <td>{{ c.Fecha|default:"—" }}</td>
+                <td>{{ c.Hora|default:"—" }}</td>
+                <td>{{ c.Cliente|default:"—" }}</td>
+                <td>{{ c.Telefono

@@ -102,7 +102,7 @@
                     <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
                 </td>
             </tr>
-            {% endfor %}
+            {% endfor %}  <!-- ✅ ¡CORREGIDO! Tag endfor añadido -->
         </tbody>
     </table>
 </div>

@@ -1,58 +1,61 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-<div class="card-custom p-4">
-
-    <!-- Menú de navegación (sin "Configuración") -->
-    <nav class="navbar-nav-horizontal mb-4">
-        <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">Inicio</a>
-        <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">Posibles clientes</a>
-        <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">Gastos</a>
-        <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">Resumen</a>
-    </nav>
-
-    <h2 class="mb-4">Configuración</h2>
-
-    <!-- Backup -->
-    <div class="mb-5">
-        <h5 class="section-title mb-3">Copia de seguridad</h5>
-        <p class="mb-3">Descarga todos tus pedidos en un archivo JSON.</p>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="accion" value="backup">
-            <button type="submit" class="btn btn-primary">📥 Descargar backup</button>
-        </form>
-    </div>
-
-    <!-- Restaurar -->
-    <div class="mb-5">
-        <h5 class="section-title mb-3">Restaurar desde backup</h5>
-        <p class="mb-3">Sube un archivo JSON de backup para reemplazar todos tus pedidos actuales.</p>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <input type="hidden" name="accion" value="restore_preview">
-            <div class="d-flex gap-2 align-items-end">
-                <div style="flex:1;">
-                    <input type="file" name="backup_file" accept=".json" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-outline-warning">🔍 Vista previa</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Mensajes -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
-        {% endfor %}
+<!-- Menú de navegación -->
+<nav class="navbar-nav-horizontal mb-4">
+    {% if request.resolver_match.url_name != 'pedidos_home' %}
+    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
     {% endif %}
+    {% if request.resolver_match.url_name != 'agenda' %}
+    <a href="{% url 'agenda' %}" class="nav-item {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}">📅 Agenda</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'gastos' %}
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
+    {% endif %}
+</nav>
 
+<h2>⚙️ Configuración</h2>
+
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">💾 Copia de seguridad</h5>
+    <p>Descarga todos tus pedidos en un archivo JSON.</p>
+    <form method="POST" action="{% url 'configuracion' %}">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="backup">
+        <button type="submit" class="btn btn-primary">📥 Descargar backup</button>
+    </form>
 </div>
 
-<style>
-.section-title {
-    color: var(--text-color);
-}
-</style>
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">🔄 Restaurar desde backup</h5>
+    <p>Sube un archivo JSON de backup para reemplazar todos tus pedidos actuales.</p>
+    <form method="POST" action="{% url 'configuracion' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="accion" value="restore_preview">
+        <div class="mb-3">
+            <input type="file" name="backup_file" class="form-control" accept=".json" required>
+        </div>
+        <button type="submit" class="btn btn-warning">🔍 Vista previa</button>
+    </form>
+</div>
+
+{% if messages %}
+<div class="alert alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+    <div{% if message.tags %} class="alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+    {% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="d-flex gap-2">
+    <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+</div>
 
 {% endblock %}

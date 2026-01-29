@@ -552,3 +552,68 @@ def agenda(request):
         print(f"Error al cargar citas: {e}")
     
     return render(request, "pedidos/agenda.html", {"citas": citas})
+
+@login_required
+def agenda_guardar(request):
+    if request.method == 'POST':
+        db = get_firestore_client()
+        
+        cita_id = request.POST.get('cita_id', '').strip()
+        fecha = request.POST.get('Fecha', '').strip()
+        hora = request.POST.get('Hora', '').strip()
+        cliente = request.POST.get('Cliente', '').strip()
+        telefono = request.POST.get('Telefono', '').strip()
+        tipo = request.POST.get('Tipo', '').strip()
+        club = request.POST.get('Club', '').strip()
+        notas = request.POST.get('Notas', '').strip()
+        
+        # Validar campos obligatorios
+        if not fecha or not hora or not cliente or not telefono or not tipo:
+            messages.error(request, "Por favor, completa todos los campos obligatorios.")
+            return redirect('agenda')
+        
+        # Crear datos de la cita
+        data = {
+            "Fecha": fecha,
+            "Hora": hora,
+            "Cliente": cliente,
+            "Telefono": telefono,
+            "Tipo": tipo,
+            "Club": club,
+            "Notas": notas,
+            "Fecha_creacion": datetime.now().isoformat()
+        }
+        
+        try:
+            if cita_id:
+                # Actualizar cita existente
+                cita_ref = db.collection("citas").document(cita_id)
+                cita_ref.update(data)
+                messages.success(request, "✅ Cita actualizada correctamente.")
+            else:
+                # Crear nueva cita
+                db.collection("citas").add(data)
+                messages.success(request, "✅ Cita creada correctamente.")
+        except Exception as e:
+            messages.error(request, f"❌ Error al guardar la cita: {str(e)}")
+        
+        return redirect('agenda')
+    
+    return redirect('agenda')
+
+
+@login_required
+def agenda_eliminar(request, cita_id):
+    if request.method == 'GET':
+        db = get_firestore_client()
+        
+        try:
+            # Eliminar cita
+            db.collection("citas").document(cita_id).delete()
+            messages.success(request, "✅ Cita eliminada correctamente.")
+        except Exception as e:
+            messages.error(request, f"❌ Error al eliminar la cita: {str(e)}")
+        
+        return redirect('agenda')
+    
+    return redirect('agenda')

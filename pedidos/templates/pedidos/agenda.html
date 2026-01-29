@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-<h1>TEST AGENDA</h1>
-<p>✅ Si ves esto, el template funciona</p>
+<!-- Menú de navegación -->
+<nav class="navbar-nav-horizontal mb-4">
+    <a href="{% url 'pedidos_home' %}" class="nav-item">🏠 Inicio</a>
+    <a href="{% url 'posibles_clientes' %}" class="nav-item">👥 Posibles clientes</a>
+    <a href="{% url 'gastos' %}" class="nav-item">💰 Gastos</a>
+    <a href="{% url 'resumen' %}" class="nav-item">📊 Resumen</a>
+    <a href="{% url 'configuracion' %}" class="nav-item">⚙️ Configuración</a>
+</nav>
+
+<h2>📅 Agenda</h2>
+
+<button type="button" class="btn btn-primary mb-4">➕ Nueva cita</button>
 
 {% endblock %}

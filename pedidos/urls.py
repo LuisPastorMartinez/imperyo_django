@@ -14,4 +14,6 @@ urlpatterns = [
     path("resumen/", views.resumen, name="resumen"),
     path("configuracion/", views.configuracion, name="configuracion"),
     path('agenda/', views.agenda, name='agenda'),
+    path('agenda/guardar/', views.agenda_guardar, name='agenda_guardar'),
+    path('agenda/eliminar/<str:cita_id>/', views.agenda_eliminar, name='agenda_eliminar')
 ]

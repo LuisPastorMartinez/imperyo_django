@@ -72,4 +72,48 @@
     </form>
 </div>
 
+{% if citas %}
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
+    <table class="table-home table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Club</th>
+                <th>Tipo</th>
+                <th>Notas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in citas %}
+            <tr>
+                <td>{{ c.Fecha|default:"—" }}</td>
+                <td>{{ c.Hora|default:"—" }}</td>
+                <td>{{ c.Cliente|default:"—" }}</td>
+                <td>{{ c.Telefono|default:"—" }}</td>
+                <td>{{ c.Club|default:"—" }}</td>
+                <td>{{ c.Tipo|default:"—" }}</td>
+                <td>{{ c.Notas|default:"—" }}</td>
+                <td>
+                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card-custom">
+    <p>📭 No hay citas programadas</p>
+</div>
+{% endif %}
+
+<div class="d-flex gap-2 mt-4">
+    <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+</div>
+
 {% endblock %}

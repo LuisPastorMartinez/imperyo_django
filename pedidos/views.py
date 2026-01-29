@@ -527,3 +527,10 @@ def configuracion(request):
                 return redirect("configuracion")
 
     return render(request, "pedidos/configuracion.html")
+# ======================================================
+# AGENDA
+# ======================================================
+@login_required
+def agenda(request):
+    return render(request, "pedidos/agenda.html")
+

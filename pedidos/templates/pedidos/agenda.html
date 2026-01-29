@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block contenido %}
 
 <!-- Menú de navegación -->
@@ -68,8 +69,8 @@
                 </select>
             </div>
             <div class="col-md-6">
-                <label>Relacionado con pedido</label>
-                <input type="text" name="Pedido_ID" id="Pedido_ID" class="form-control" placeholder="ID del pedido (opcional)">
+                <label>Club</label>
+                <input type="text" name="Club" id="Club" class="form-control" placeholder="Nombre del club (opcional)">
             </div>
         </div>
         
@@ -99,6 +100,7 @@
                 <th>Hora</th>
                 <th>Cliente</th>
                 <th>Teléfono</th>
+                <th>Club</th>
                 <th>Tipo</th>
                 <th>Notas</th>
                 <th>Acciones</th>
@@ -111,6 +113,7 @@
                 <td>{{ c.Hora|default:"—" }}</td>
                 <td>{{ c.Cliente|default:"—" }}</td>
                 <td>{{ c.Telefono|default:"—" }}</td>
+                <td>{{ c.Club|default:"—" }}</td>
                 <td>
                     {% if c.Tipo == "Nuevo cliente" %}
                         👤 {{ c.Tipo }}
@@ -126,7 +129,17 @@
                 </td>
                 <td>{{ c.Notas|default:"Sin notas"|truncatechars:50 }}</td>
                 <td>
-                    <button type="button" class="btn btn-sm btn-warning btn-editar" data-id="{{ c.ID }}" data-fecha="{{ c.Fecha }}" data-hora="{{ c.Hora }}" data-cliente="{{ c.Cliente }}" data-telefono="{{ c.Telefono }}" data-tipo="{{ c.Tipo }}" data-notas="{{ c.Notas }}" data-pedido-id="{{ c.Pedido_ID }}">✏️ Editar</button>
+                    <button type="button" class="btn btn-sm btn-warning btn-editar" 
+                        data-id="{{ c.ID }}" 
+                        data-fecha="{{ c.Fecha }}" 
+                        data-hora="{{ c.Hora }}" 
+                        data-cliente="{{ c.Cliente }}" 
+                        data-telefono="{{ c.Telefono }}" 
+                        data-tipo="{{ c.Tipo }}" 
+                        data-club="{{ c.Club }}" 
+                        data-notas="{{ c.Notas }}">
+                        ✏️ Editar
+                    </button>
                     <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta cita?')">🗑️ Eliminar</a>
                 </td>
             </tr>
@@ -167,18 +180,18 @@ document.querySelectorAll('.btn-editar').forEach(btn => {
         const cliente = this.getAttribute('data-cliente');
         const telefono = this.getAttribute('data-telefono');
         const tipo = this.getAttribute('data-tipo');
+        const club = this.getAttribute('data-club');
         const notas = this.getAttribute('data-notas');
-        const pedidoId = this.getAttribute('data-pedido-id');
         
         // Rellenar formulario
         document.getElementById('cita_id').value = id;
-        document.getElementById('Fecha').value = fecha;
-        document.getElementById('Hora').value = hora;
-        document.getElementById('Cliente').value = cliente;
-        document.getElementById('Telefono').value = telefono;
-        document.getElementById('Tipo').value = tipo;
-        document.getElementById('Notas').value = notas;
-        document.getElementById('Pedido_ID').value = pedidoId || '';
+        document.getElementById('Fecha').value = fecha || '';
+        document.getElementById('Hora').value = hora || '';
+        document.getElementById('Cliente').value = cliente || '';
+        document.getElementById('Telefono').value = telefono || '';
+        document.getElementById('Tipo').value = tipo || '';
+        document.getElementById('Club').value = club || '';
+        document.getElementById('Notas').value = notas || '';
         
         // Cambiar título
         document.querySelector('.section-title').textContent = '✏️ Editar cita';

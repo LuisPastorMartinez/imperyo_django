@@ -22,20 +22,174 @@
 
 <h2>📅 Agenda</h2>
 
-<div class="card-custom mb-4">
-    <h5 class="section-title mb-3">Próximamente...</h5>
-    <p>Esta sección permitirá gestionar citas y recordatorios con clientes.</p>
-    <p>Funcionalidades planeadas:</p>
-    <ul>
-        <li>📅 Crear citas con clientes nuevos o existentes</li>
-        <li>📝 Anotar detalles de lo que quiere cada cliente</li>
-        <li>🔔 Recordatorios de seguimiento</li>
-        <li>📎 Vincular citas con pedidos existentes</li>
-    </ul>
+<!-- BOTÓN PARA NUEVA CITA -->
+<button type="button" class="btn btn-primary mb-4" onclick="toggleFormulario()">➕ Nueva cita</button>
+
+<!-- FORMULARIO PARA CREAR/EDITAR CITA -->
+<div id="formulario-cita" class="card-custom mb-4" style="display: none;">
+    <h5 class="section-title mb-3">📝 Nueva cita</h5>
+    
+    <form method="POST" action="{% url 'agenda_guardar' %}" id="form-cita">
+        {% csrf_token %}
+        
+        <input type="hidden" name="cita_id" id="cita_id" value="">
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Fecha *</label>
+                <input type="date" name="Fecha" id="Fecha" class="form-control input-fecha-calendario" required>
+            </div>
+            <div class="col-md-6">
+                <label>Hora *</label>
+                <input type="time" name="Hora" id="Hora" class="form-control" required>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Cliente *</label>
+                <input type="text" name="Cliente" id="Cliente" class="form-control" placeholder="Nombre del cliente" required>
+            </div>
+            <div class="col-md-6">
+                <label>Teléfono *</label>
+                <input type="tel" name="Telefono" id="Telefono" class="form-control" placeholder="Teléfono de contacto" required>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Tipo *</label>
+                <select name="Tipo" id="Tipo" class="form-control" required>
+                    <option value="">— Seleccionar tipo —</option>
+                    <option value="Nuevo cliente">Nuevo cliente</option>
+                    <option value="Cliente existente">Cliente existente</option>
+                    <option value="Seguimiento">Seguimiento</option>
+                    <option value="Reunión">Reunión</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label>Relacionado con pedido</label>
+                <input type="text" name="Pedido_ID" id="Pedido_ID" class="form-control" placeholder="ID del pedido (opcional)">
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-12">
+                <label>Notas</label>
+                <textarea name="Notas" id="Notas" class="form-control" rows="4" placeholder="Detalles de la cita, qué necesita el cliente, etc."></textarea>
+            </div>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">💾 Guardar cita</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleFormulario()">Cancelar</button>
+        </div>
+    </form>
 </div>
+
+<!-- TABLA DE CITAS -->
+{% if citas %}
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">📋 Citas programadas ({{ citas|length }})</h5>
+    
+    <table class="table-home table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Tipo</th>
+                <th>Notas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in citas %}
+            <tr>
+                <td>{{ c.Fecha|default:"—" }}</td>
+                <td>{{ c.Hora|default:"—" }}</td>
+                <td>{{ c.Cliente|default:"—" }}</td>
+                <td>{{ c.Telefono|default:"—" }}</td>
+                <td>
+                    {% if c.Tipo == "Nuevo cliente" %}
+                        👤 {{ c.Tipo }}
+                    {% elif c.Tipo == "Cliente existente" %}
+                        🔄 {{ c.Tipo }}
+                    {% elif c.Tipo == "Seguimiento" %}
+                        📞 {{ c.Tipo }}
+                    {% elif c.Tipo == "Reunión" %}
+                        💼 {{ c.Tipo }}
+                    {% else %}
+                        {{ c.Tipo }}
+                    {% endif %}
+                </td>
+                <td>{{ c.Notas|default:"Sin notas"|truncatechars:50 }}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-warning btn-editar" data-id="{{ c.ID }}" data-fecha="{{ c.Fecha }}" data-hora="{{ c.Hora }}" data-cliente="{{ c.Cliente }}" data-telefono="{{ c.Telefono }}" data-tipo="{{ c.Tipo }}" data-notas="{{ c.Notas }}" data-pedido-id="{{ c.Pedido_ID }}">✏️ Editar</button>
+                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta cita?')">🗑️ Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card-custom">
+    <p>📭 No hay citas programadas.</p>
+</div>
+{% endif %}
 
 <div class="d-flex gap-2">
     <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
 </div>
+
+<!-- SCRIPT PARA EDITAR CITAS -->
+<script>
+function toggleFormulario() {
+    const form = document.getElementById('formulario-cita');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    
+    // Limpiar formulario si se cierra
+    if (form.style.display === 'none') {
+        document.getElementById('form-cita').reset();
+        document.getElementById('cita_id').value = '';
+        document.querySelector('.section-title').textContent = '📝 Nueva cita';
+    }
+}
+
+// Editar cita
+document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const fecha = this.getAttribute('data-fecha');
+        const hora = this.getAttribute('data-hora');
+        const cliente = this.getAttribute('data-cliente');
+        const telefono = this.getAttribute('data-telefono');
+        const tipo = this.getAttribute('data-tipo');
+        const notas = this.getAttribute('data-notas');
+        const pedidoId = this.getAttribute('data-pedido-id');
+        
+        // Rellenar formulario
+        document.getElementById('cita_id').value = id;
+        document.getElementById('Fecha').value = fecha;
+        document.getElementById('Hora').value = hora;
+        document.getElementById('Cliente').value = cliente;
+        document.getElementById('Telefono').value = telefono;
+        document.getElementById('Tipo').value = tipo;
+        document.getElementById('Notas').value = notas;
+        document.getElementById('Pedido_ID').value = pedidoId || '';
+        
+        // Cambiar título
+        document.querySelector('.section-title').textContent = '✏️ Editar cita';
+        
+        // Mostrar formulario
+        document.getElementById('formulario-cita').style.display = 'block';
+        
+        // Scroll al formulario
+        document.getElementById('formulario-cita').scrollIntoView({ behavior: 'smooth' });
+    });
+});
+</script>
 
 {% endblock %}

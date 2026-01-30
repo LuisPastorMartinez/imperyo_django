@@ -4,11 +4,11 @@ from django.contrib.auth.decorators import login_required
 from utils.firestore_utils import get_firestore_client
 from datetime import date, datetime
 from django.contrib import messages
-import json  # 👈 Añadido aquí al inicio
+import json
 
-======================================================
-LISTADO
-======================================================
+# ======================================================
+# LISTADO
+# ======================================================
 @login_required
 def pedidos_home(request):
     db = get_firestore_client()
@@ -46,9 +46,9 @@ def pedidos_home(request):
 
     return render(request, "pedidos/home.html", {"pedidos": pedidos})
 
-======================================================
-CREAR
-======================================================
+# ======================================================
+# CREAR
+# ======================================================
 @login_required
 def pedido_crear(request):
     db = get_firestore_client()
@@ -163,9 +163,9 @@ def pedido_crear(request):
         "fecha_hoy": date.today().isoformat(),
     })
 
-======================================================
-EDITAR
-======================================================
+# ======================================================
+# EDITAR
+# ======================================================
 @login_required
 def pedido_editar(request, pedido_id):
     db = get_firestore_client()
@@ -292,9 +292,9 @@ def pedido_editar(request, pedido_id):
         "tejidos_disponibles": sorted(tejidos_disponibles),
     })
 
-======================================================
-DETALLE
-======================================================
+# ======================================================
+# DETALLE
+# ======================================================
 @login_required
 def pedido_detalle(request, pedido_id):
     db = get_firestore_client()
@@ -311,9 +311,9 @@ def pedido_detalle(request, pedido_id):
         "pedido": pedido,
     })
 
-======================================================
-ELIMINAR
-======================================================
+# ======================================================
+# ELIMINAR
+# ======================================================
 @login_required
 def pedido_eliminar(request, pedido_id):
     db = get_firestore_client()
@@ -356,23 +356,23 @@ def pedido_eliminar(request, pedido_id):
         "pedido": pedido,
     })
 
-======================================================
-POSIBLES CLIENTES
-======================================================
+# ======================================================
+# POSIBLES CLIENTES
+# ======================================================
 @login_required
 def posibles_clientes(request):
     return render(request, "pedidos/posibles_clientes.html")
 
-======================================================
-GASTOS
-======================================================
+# ======================================================
+# GASTOS
+# ======================================================
 @login_required
 def gastos(request):
     return render(request, "pedidos/gastos.html")
 
-======================================================
-RESUMEN
-======================================================
+# ======================================================
+# RESUMEN
+# ======================================================
 @login_required
 def resumen(request):
     db = get_firestore_client()
@@ -416,9 +416,9 @@ def resumen(request):
         "estados_todos": estados_todos
     })
 
-======================================================
-CONFIGURACIÓN
-======================================================
+# ======================================================
+# CONFIGURACIÓN
+# ======================================================
 @login_required
 def configuracion(request):
     db = get_firestore_client()
@@ -446,7 +446,6 @@ def configuracion(request):
             # --- VISTA PREVIA DE RESTAURACIÓN ---
             archivo = request.FILES.get("backup_file")
             if not archivo:
-                from django.contrib import messages
                 messages.error(request, "⚠️ No se ha seleccionado ningún archivo.")
                 return redirect("configuracion")
 
@@ -467,11 +466,9 @@ def configuracion(request):
                 })
 
             except (json.JSONDecodeError, UnicodeDecodeError):
-                from django.contrib import messages
                 messages.error(request, "❌ El archivo no es un JSON válido.")
                 return redirect("configuracion")
             except Exception as e:
-                from django.contrib import messages
                 messages.error(request, f"❌ Error al leer el archivo: {str(e)}")
                 return redirect("configuracion")
 
@@ -479,7 +476,6 @@ def configuracion(request):
             # --- EJECUTAR RESTAURACIÓN ---
             backup_data = request.session.get("backup_data")
             if not backup_data:
-                from django.contrib import messages
                 messages.error(request, "⚠️ No hay datos de backup pendientes. Sube un archivo primero.")
                 return redirect("configuracion")
 
@@ -503,20 +499,18 @@ def configuracion(request):
                 request.session.pop("backup_data", None)
                 request.session.pop("backup_filename", None)
 
-                from django.contrib import messages
                 messages.success(request, f"✅ ¡Backup restaurado con éxito! Se han cargado {len(backup_data)} pedidos.")
                 return redirect("configuracion")
 
             except Exception as e:
-                from django.contrib import messages
                 messages.error(request, f"❌ Error al restaurar: {str(e)}")
                 return redirect("configuracion")
 
     return render(request, "pedidos/configuracion.html")
 
-======================================================
-AGENDA
-======================================================
+# ======================================================
+# AGENDA
+# ======================================================
 @login_required
 def agenda(request):
     try:

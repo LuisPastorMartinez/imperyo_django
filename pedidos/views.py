@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from utils.firestore_utils import get_firestore_client
 from datetime import date, datetime
 from django.contrib import messages
-import json
+import json  # 👈 Añadido aquí al inicio
+
 
 # ======================================================
 # LISTADO
@@ -14,6 +15,7 @@ def pedidos_home(request):
     db = get_firestore_client()
     pedidos_ref = db.collection("pedidos")
     docs = pedidos_ref.stream()
+
     # Mapeo de estados a iconos
     ICONOS_ESTADOS = {
         "Nuevo": "🟢",
@@ -52,6 +54,7 @@ def pedidos_home(request):
 @login_required
 def pedido_crear(request):
     db = get_firestore_client()
+
     # === CARGAR PRODUCTOS ===
     productos_disponibles = []
     try:
@@ -153,7 +156,7 @@ def pedido_crear(request):
 
         return redirect("/pedidos/")
 
-    estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado", "retirado", "trabajo terminado"]
+    estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado",                              "retirado", "trabajo terminado"]
 
     return render(request, "pedidos/crear.html", {
         "pedido_id": nuevo_id,
@@ -163,12 +166,14 @@ def pedido_crear(request):
         "fecha_hoy": date.today().isoformat(),
     })
 
+
 # ======================================================
 # EDITAR
 # ======================================================
 @login_required
 def pedido_editar(request, pedido_id):
     db = get_firestore_client()
+
     ref = db.collection("pedidos").document(str(pedido_id))
     doc = ref.get()
 
@@ -292,12 +297,14 @@ def pedido_editar(request, pedido_id):
         "tejidos_disponibles": sorted(tejidos_disponibles),
     })
 
+
 # ======================================================
 # DETALLE
 # ======================================================
 @login_required
 def pedido_detalle(request, pedido_id):
     db = get_firestore_client()
+
     ref = db.collection("pedidos").document(str(pedido_id))
     doc = ref.get()
 
@@ -311,6 +318,7 @@ def pedido_detalle(request, pedido_id):
         "pedido": pedido,
     })
 
+
 # ======================================================
 # ELIMINAR
 # ======================================================
@@ -319,6 +327,7 @@ def pedido_eliminar(request, pedido_id):
     db = get_firestore_client()
     ref = db.collection("pedidos").document(str(pedido_id))
     doc = ref.get()
+
     if not doc.exists:
         return HttpResponse("Pedido no encontrado", status=404)
 
@@ -356,6 +365,7 @@ def pedido_eliminar(request, pedido_id):
         "pedido": pedido,
     })
 
+
 # ======================================================
 # POSIBLES CLIENTES
 # ======================================================
@@ -363,12 +373,14 @@ def pedido_eliminar(request, pedido_id):
 def posibles_clientes(request):
     return render(request, "pedidos/posibles_clientes.html")
 
+
 # ======================================================
 # GASTOS
 # ======================================================
 @login_required
 def gastos(request):
     return render(request, "pedidos/gastos.html")
+
 
 # ======================================================
 # RESUMEN
@@ -378,6 +390,7 @@ def resumen(request):
     db = get_firestore_client()
     pedidos_ref = db.collection("pedidos")
     docs = pedidos_ref.stream()
+
     ICONOS_ESTADOS = {
         "Nuevo": "🟢",
         "diseño": "🎨",
@@ -416,12 +429,14 @@ def resumen(request):
         "estados_todos": estados_todos
     })
 
+
 # ======================================================
 # CONFIGURACIÓN
 # ======================================================
 @login_required
 def configuracion(request):
     db = get_firestore_client()
+
     if request.method == "POST":
         if request.POST.get("accion") == "backup":
             # --- EXPORTAR ---
@@ -446,6 +461,7 @@ def configuracion(request):
             # --- VISTA PREVIA DE RESTAURACIÓN ---
             archivo = request.FILES.get("backup_file")
             if not archivo:
+                from django.contrib import messages
                 messages.error(request, "⚠️ No se ha seleccionado ningún archivo.")
                 return redirect("configuracion")
 
@@ -466,9 +482,11 @@ def configuracion(request):
                 })
 
             except (json.JSONDecodeError, UnicodeDecodeError):
+                from django.contrib import messages
                 messages.error(request, "❌ El archivo no es un JSON válido.")
                 return redirect("configuracion")
             except Exception as e:
+                from django.contrib import messages
                 messages.error(request, f"❌ Error al leer el archivo: {str(e)}")
                 return redirect("configuracion")
 
@@ -476,6 +494,7 @@ def configuracion(request):
             # --- EJECUTAR RESTAURACIÓN ---
             backup_data = request.session.get("backup_data")
             if not backup_data:
+                from django.contrib import messages
                 messages.error(request, "⚠️ No hay datos de backup pendientes. Sube un archivo primero.")
                 return redirect("configuracion")
 
@@ -499,15 +518,16 @@ def configuracion(request):
                 request.session.pop("backup_data", None)
                 request.session.pop("backup_filename", None)
 
+                from django.contrib import messages
                 messages.success(request, f"✅ ¡Backup restaurado con éxito! Se han cargado {len(backup_data)} pedidos.")
                 return redirect("configuracion")
 
             except Exception as e:
+                from django.contrib import messages
                 messages.error(request, f"❌ Error al restaurar: {str(e)}")
                 return redirect("configuracion")
 
     return render(request, "pedidos/configuracion.html")
-
 # ======================================================
 # AGENDA
 # ======================================================
@@ -517,6 +537,7 @@ def agenda(request):
         db = get_firestore_client()
         citas_ref = db.collection("citas")
         docs = citas_ref.stream()
+        
         citas = []
         citas_hoy = 0
         hoy = date.today().isoformat()
@@ -537,7 +558,7 @@ def agenda(request):
         citas = []
         citas_hoy = 0
         print(f"Error al cargar citas: {e}")
-
+    
     return render(request, "pedidos/agenda.html", {
         "citas": citas,
         "citas_hoy_count": citas_hoy  # 👈 Añadido contador
@@ -547,6 +568,7 @@ def agenda(request):
 def agenda_guardar(request):
     if request.method == 'POST':
         db = get_firestore_client()
+        
         cita_id = request.POST.get('cita_id', '').strip()
         fecha = request.POST.get('Fecha', '').strip()
         hora = request.POST.get('Hora', '').strip()
@@ -587,13 +609,15 @@ def agenda_guardar(request):
             messages.error(request, f"❌ Error al guardar la cita: {str(e)}")
         
         return redirect('agenda')
-
+    
     return redirect('agenda')
+
 
 @login_required
 def agenda_eliminar(request, cita_id):
     if request.method == 'GET':
         db = get_firestore_client()
+        
         try:
             # Eliminar cita
             db.collection("citas").document(cita_id).delete()
@@ -602,5 +626,5 @@ def agenda_eliminar(request, cita_id):
             messages.error(request, f"❌ Error al eliminar la cita: {str(e)}")
         
         return redirect('agenda')
-
+    
     return redirect('agenda')

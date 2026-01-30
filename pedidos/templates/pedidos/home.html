@@ -4,14 +4,19 @@
 <!-- Menú de navegación -->
 <nav class="navbar-nav-horizontal mb-4">
     {% if request.resolver_match.url_name != 'agenda' %}
-    <a href="{% url 'agenda' %}" class="nav-item {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}">
-        📅 Agenda
-        {% if citas_hoy_count_global > 0 %}
-            <span class="badge bg-danger">{{ citas_hoy_count_global }}</span>
-        {% endif %}
-    </a>
+    <a href="{% url 'agenda' %}" class="nav-item {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}">📅 Agenda</a>
     {% endif %}
-…    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'gastos' %}
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'configuracion' %}
+    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
     {% endif %}
 </nav>
 

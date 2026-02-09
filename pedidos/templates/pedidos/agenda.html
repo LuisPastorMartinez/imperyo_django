@@ -1,137 +1,263 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-<!-- Menú de navegación -->
-<nav class="navbar-nav-horizontal mb-4">
+
     {% if request.resolver_match.url_name != 'pedidos_home' %}
-    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
+    
+[🏠 Inicio]({% url 'pedidos_home' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'posibles_clientes' %}
-    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    
+[👥 Posibles clientes]({% url 'posibles_clientes' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'gastos' %}
-    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    
+[💰 Gastos]({% url 'gastos' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'resumen' %}
-    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
+    
+[📊 Resumen]({% url 'resumen' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'configuracion' %}
-    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
+    
+[⚙️ Configuración]({% url 'configuracion' %})
     {% endif %}
-</nav>
-
-<h2>📅 Agenda</h2>
-
-<!-- Botón Nueva cita con badge -->
-<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario').style.display='block'">
+📅 Agenda
     ➕ Nueva cita
     {% if citas_hoy_count > 0 %}
-        <span class="badge bg-danger ms-2">{{ citas_hoy_count }} hoy</span>
+        {{ citas_hoy_count }} hoy
     {% endif %}
-</button>
-
-<!-- Formulario -->
-<div id="formulario" class="card-custom mb-4" style="display:none;">
-    <h5 class="section-title mb-3">📝 Nueva cita</h5>
-    <form method="POST" action="{% url 'agenda_guardar' %}">
+📝 Nueva cita
         {% csrf_token %}
         
-        <input type="hidden" name="cita_id" value="">
-        
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label>Fecha *</label>
-                <input type="date" name="Fecha" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label>Hora *</label>
-                <input type="time" name="Hora" class="form-control" required>
-            </div>
-        </div>
-        
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label>Cliente *</label>
-                <input type="text" name="Cliente" class="form-control" placeholder="Nombre del cliente" required>
-            </div>
-            <div class="col-md-6">
-                <label>Teléfono *</label>
-                <input type="tel" name="Telefono" class="form-control" placeholder="Teléfono" required>
-            </div>
-        </div>
-        
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label>Tipo *</label>
-                <select name="Tipo" class="form-control" required>
-                    <option value="">— Seleccionar —</option>
-                    <option value="Nuevo cliente">Nuevo cliente</option>
-                    <option value="Cliente existente">Cliente existente</option>
-                    <option value="Seguimiento">Seguimiento</option>
-                    <option value="Reunión">Reunión</option>
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label>Club</label>
-                <input type="text" name="Club" class="form-control" placeholder="Nombre del club">
-            </div>
-        </div>
-        
-        <div class="mb-3">
-            <label>Notas</label>
-            <textarea name="Notas" class="form-control" rows="3" placeholder="Detalles de la cita"></textarea>
-        </div>
-        
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">💾 Guardar</button>
-            <button type="button" class="btn btn-secondary" onclick="document.getElementById('formulario').style.display='none'">Cancelar</button>
-        </div>
-    </form>
-</div>
-
-<!-- Tabla de citas -->
+         Fecha * Hora * Cliente * Teléfono * Tipo * — Seleccionar — Nuevo cliente Cliente existente Seguimiento Reunión Club Notas 💾 Guardar Cancelar 
 {% if citas %}
-<div class="card-custom mb-4">
-    <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
-    <table class="table-home table table-striped">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Cliente</th>
-                <th>Teléfono</th>
-                <th>Club</th>
-                <th>Tipo</th>
-                <th>Notas</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
+📋 Citas ({{ citas|length }})
+| Fecha
+|Hora
+|Cliente
+|Teléfono
+|Club
+|Tipo
+|Notas
+|Acciones
+|
+| ---|---|---|---|---|---|---|---|
             {% for c in citas %}
-            <tr>
-                <td>{{ c.Fecha|default:"—" }}</td>
-                <td>{{ c.Hora|default:"—" }}</td>
-                <td>{{ c.Cliente|default:"—" }}</td>
-                <td>{{ c.Telefono|default:"—" }}</td>
-                <td>{{ c.Club|default:"—" }}</td>
-                <td>{{ c.Tipo|default:"—" }}</td>
-                <td>{{ c.Notas|default:"—" }}</td>
-                <td>
-                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
-                </td>
-            </tr>
+            
+| {{ c.Fecha|default:"—" }}
+|{{ c.Hora|default:"—" }}
+|{{ c.Cliente|default:"—" }}
+|{{ c.Telefono|default:"—" }}
+|{{ c.Club|default:"—" }}
+|{{ c.Tipo|default:"—" }}
+|{{ c.Notas|default:"—" }}
+|  [🗑️]({% url 'agenda_eliminar' c.ID %})  
+|
+| ---|---|---|---|---|---|---|---|
             {% endfor %}
-        </tbody>
-    </table>
-</div>
+        
 {% else %}
-<div class="card-custom">
-    <p>📭 No hay citas programadas</p>
-</div>
+📭 No hay citas programadas
 {% endif %}
 
-<div class="d-flex gap-2 mt-4">
-    <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+<!-- ============================================ -->
+<!-- 🔹 NUEVA SECCIÓN: TAREAS DIARIAS -->
+<!-- ============================================ -->
+<div style="margin-top: 40px; padding: 20px; background: #f0f8ff; border-radius: 10px; border: 2px solid #4682b4;">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">✅ Lista de Tareas</h2>
+    
+    <!-- Formulario para nueva tarea -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3 style="color: #3498db; margin-bottom: 15px;">➕ Nueva Tarea</h3>
+        <form id="formTarea" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;">👤 Cliente / Club *</label>
+                <input 
+                    type="text" 
+                    id="tareaClienteClub" 
+                    placeholder="Ej: Amigos de la tercera edad"
+                    style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+                    required
+                >
+            </div>
+            
+            <div style="flex: 2; min-width: 300px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;">📝 Descripción de la tarea *</label>
+                <input 
+                    type="text" 
+                    id="tareaDescripcion" 
+                    placeholder="Ej: Llamar para confirmar pedido de camisetas"
+                    style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+                    required
+                >
+            </div>
+            
+            <button 
+                type="submit" 
+                style="background: #27ae60; color: white; padding: 12px 25px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.3s;"
+                onmouseover="this.style.background='#229954'" 
+                onmouseout="this.style.background='#27ae60'"
+            >
+                📥 Añadir Tarea
+            </button>
+        </form>
+    </div>
+    
+    <!-- Lista de tareas -->
+    <div id="listaTareasContainer">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Tareas Pendientes (0)</h3>
+        <div id="listaTareas" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Las tareas se cargarán aquí dinámicamente -->
+            <p id="mensajeVacio" style="text-align: center; color: #7f8c8d; font-style: italic;">📭 No hay tareas pendientes</p>
+        </div>
+    </div>
 </div>
 
+<script>
+// ============================================
+// 🔹 FUNCIONALIDAD DE TAREAS
+// ============================================
+
+// Cargar tareas al iniciar
+document.addEventListener('DOMContentLoaded', function() {
+    cargarTareas();
+    
+    // Manejar formulario
+    document.getElementById('formTarea').addEventListener('submit', function(e) {
+        e.preventDefault();
+        agregarTarea();
+    });
+});
+
+// 🔹 Agregar nueva tarea
+function agregarTarea() {
+    const clienteClub = document.getElementById('tareaClienteClub').value.trim();
+    const descripcion = document.getElementById('tareaDescripcion').value.trim();
+    
+    if (!clienteClub || !descripcion) {
+        alert('⚠️ Por favor, completa ambos campos');
+        return;
+    }
+    
+    // Crear objeto tarea
+    const tarea = {
+        id: 'tarea_' + Date.now(),
+        clienteClub: clienteClub,
+        descripcion: descripcion,
+        completada: false,
+        fechaCreacion: new Date().toISOString()
+    };
+    
+    // Guardar en localStorage (simulación hasta que se integre con Firebase)
+    let tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
+    tareas.push(tarea);
+    localStorage.setItem('tareasDiarias', JSON.stringify(tareas));
+    
+    // Limpiar formulario
+    document.getElementById('tareaClienteClub').value = '';
+    document.getElementById('tareaDescripcion').value = '';
+    
+    // Recargar lista
+    cargarTareas();
+    
+    alert('✅ Tarea añadida correctamente');
+}
+
+// 🔹 Cargar tareas
+function cargarTareas() {
+    const tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
+    const lista = document.getElementById('listaTareas');
+    const mensajeVacio = document.getElementById('mensajeVacio');
+    const contador = document.querySelector('#listaTareasContainer h3');
+    
+    // Filtrar tareas pendientes
+    const tareasPendientes = tareas.filter(t => !t.completada);
+    
+    // Actualizar contador
+    contador.textContent = `📋 Tareas Pendientes (${tareasPendientes.length})`;
+    
+    // Limpiar lista
+    lista.innerHTML = '';
+    
+    if (tareasPendientes.length === 0) {
+        lista.appendChild(mensajeVacio);
+        return;
+    }
+    
+    // Mostrar tareas
+    tareasPendientes.forEach(tarea => {
+        const tareaDiv = document.createElement('div');
+        tareaDiv.style.cssText = `
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #3498db;
+        `;
+        
+        tareaDiv.innerHTML = `
+            <div style="flex: 1;">
+                <strong style="color: #2c3e50; font-size: 16px;">${tarea.clienteClub}</strong>
+                <br>
+                <span style="color: #7f8c8d;">${tarea.descripcion}</span>
+                <br>
+                <small style="color: #95a5a6; font-size: 12px;">
+                    📅 ${new Date(tarea.fechaCreacion).toLocaleDateString('es-ES')}
+                </small>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button 
+                    onclick="completarTarea('${tarea.id}')" 
+                    style="background: #27ae60; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+                    title="Marcar como completada"
+                >
+                    ✅
+                </button>
+                <button 
+                    onclick="eliminarTarea('${tarea.id}')" 
+                    style="background: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+                    title="Eliminar tarea"
+                >
+                    🗑️
+                </button>
+            </div>
+        `;
+        
+        lista.appendChild(tareaDiv);
+    });
+}
+
+// 🔹 Completar tarea
+function completarTarea(id) {
+    if (!confirm('¿Marcar esta tarea como completada?')) return;
+    
+    let tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
+    const tarea = tareas.find(t => t.id === id);
+    
+    if (tarea) {
+        tarea.completada = true;
+        tarea.fechaCompletada = new Date().toISOString();
+        localStorage.setItem('tareasDiarias', JSON.stringify(tareas));
+        cargarTareas();
+        alert('✅ Tarea completada');
+    }
+}
+
+// 🔹 Eliminar tarea
+function eliminarTarea(id) {
+    if (!confirm('¿Eliminar esta tarea?')) return;
+    
+    let tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
+    tareas = tareas.filter(t => t.id !== id);
+    localStorage.setItem('tareasDiarias', JSON.stringify(tareas));
+    cargarTareas();
+    alert('🗑️ Tarea eliminada');
+}
+</script>
+
+[⬅️ Volver a Inicio]({% url 'pedidos_home' %})
 {% endblock %}

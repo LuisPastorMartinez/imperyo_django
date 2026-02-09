@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 {% block contenido %}
 
+    <!-- Menú de navegación -->
+<nav class="navbar-nav-horizontal mb-4">
     {% if request.resolver_match.url_name != 'pedidos_home' %}
-    <a href="{% url 'pedidos_home' %}">🏠 Inicio</a>
-    {% endif %}
-    {% if request.resolver_match.url_name != 'agenda' %}
-    <a href="{% url 'agenda' %}">📅 Agenda</a>
+    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'posibles_clientes' %}
-    <a href="{% url 'posibles_clientes' %}">👥 Posibles clientes</a>
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'gastos' %}
-    <a href="{% url 'gastos' %}">💰 Gastos</a>
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'configuracion' %}
-    <a href="{% url 'configuracion' %}">⚙️ Configuración</a>
+    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
     {% endif %}
+</nav>
+
 
 <h1>📋 Resumen de pedidos ({{ pedidos|length }})</h1>
 

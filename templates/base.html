@@ -1,371 +1,95 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ImperYo Sport - Gestión de pedidos</title>
-    <style>
-        /* ===== ESTILOS GENERALES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        /* ===== HEADER / MENÚ SUPERIOR ===== */
-        .header {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-weight: bold;
-            font-size: 1.4rem;
-        }
-        
-        .logo img {
-            height: 50px;
-            width: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-        
-        .menu {
-            display: flex;
-            gap: 15px;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .menu li {
-            display: inline;
-        }
-        
-        .menu a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 1.05rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-        
-        .menu a:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .menu a.active {
-            background: rgba(255, 255, 255, 0.25);
-            font-weight: bold;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 1.5rem;
-            padding: 8px;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: rotate(180deg);
-        }
-        
-        .logout-form {
-            margin: 0;
-            padding: 0;
-        }
-        
-        .logout-btn {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 1.05rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
-        
-        /* ===== CONTENIDO PRINCIPAL ===== */
-        main {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 25px;
-            background: white;
-            min-height: calc(100vh - 140px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        
-        /* ===== FOOTER ===== */
-        footer {
-            background: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 15px;
-            font-size: 0.9rem;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* ===== TEMA OSCURO ===== */
-        body.dark-mode {
-            background: #1a1a1a;
-            color: #f0f0f0;
-        }
-        
-        body.dark-mode main {
-            background: #252525;
-            color: #f0f0f0;
-        }
-        
-        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 {
-            color: #f0f0f0;
-        }
-        
-        /* ===== TABLAS ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.95rem;
-        }
-        
-        table th {
-            background: #4CAF50;
-            color: white;
-            font-weight: bold;
-            padding: 12px;
-            text-align: left;
-        }
-        
-        table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        
-        table tr:hover {
-            background: #f0f0f0;
-        }
-        
-        body.dark-mode table tr:nth-child(even) {
-            background: #333;
-        }
-        
-        body.dark-mode table tr:hover {
-            background: #444;
-        }
-        
-        body.dark-mode table td {
-            border-bottom: 1px solid #444;
-        }
-        
-        /* ===== BOTONES ===== */
-        button, .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover, .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-primary {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .btn-danger {
-            background: #f44336;
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #607d8b;
-            color: white;
-        }
-        
-        /* ===== ENLACES ===== */
-        a {
-            color: #2196F3;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        a:hover {
-            text-decoration: underline;
-            color: #1976D2;
-        }
-        
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px;
-            }
-            
-            .menu {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 8px;
-            }
-            
-            .menu a {
-                padding: 8px 12px;
-                font-size: 0.95rem;
-            }
-            
-            .logo {
-                font-size: 1.2rem;
-            }
-            
-            .logo img {
-                height: 40px;
-            }
-            
-            .user-info {
-                gap: 10px;
-            }
-            
-            main {
-                padding: 15px;
-            }
-        }
-    </style>
+    <title>ImperYo Sport</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Tu CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- PWA: Manifest -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+
+    <!-- PWA: Theme color -->
+    <meta name="theme-color" content="#000000">
+
+    <!-- PWA: iPhone support -->
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
 </head>
+
 <body>
-    <header class="header">
-        <div class="logo">
-            <img src="https://i.imgur.com/0G5yBdG.png" alt="Logo ImperYo Sport">
-            <span>IMPERYO SPORT</span>
+
+<nav class="navbar mb-4">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+
+        <!-- Logo -->
+        <a class="navbar-brand" href="/pedidos">
+            <div class="logo-container">
+                <img src="{% static 'logo_dark.png' %}" class="logo-dark" alt="ImperYo Sport">
+                <img src="{% static 'logo_light.png' %}" class="logo-light" alt="ImperYo Sport">
+            </div>
+        </a>
+
+        <!-- Título centrado -->
+        <div class="navbar-title-container">
+            <span class="navbar-title">ImperYo Sport</span>
         </div>
-        
-        <nav>
-            <ul class="menu">
-                {% if request.resolver_match.url_name != 'pedidos_home' %}
-                <li><a href="{% url 'pedidos_home' %}">🏠 Inicio</a></li>
-                {% endif %}
-                {% if request.resolver_match.url_name != 'agenda' %}
-                <li><a href="{% url 'agenda' %}">📅 Agenda</a></li>
-                {% endif %}
-                {% if request.resolver_match.url_name != 'posibles_clientes' %}
-                <li><a href="{% url 'posibles_clientes' %}">👥 Posibles clientes</a></li>
-                {% endif %}
-                {% if request.resolver_match.url_name != 'gastos' %}
-                <li><a href="{% url 'gastos' %}">💰 Gastos</a></li>
-                {% endif %}
-                {% if request.resolver_match.url_name != 'resumen' %}
-                <li><a href="{% url 'resumen' %}">📊 Resumen</a></li>
-                {% endif %}
-                {% if request.resolver_match.url_name != 'configuracion' %}
-                <li><a href="{% url 'configuracion' %}">⚙️ Configuración</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-        
-        <div class="user-info">
-            <span style="font-weight: 500;">👤 {{ request.user.username }}</span>
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-            <form method="post" action="/logout/" class="logout-form">
-                {% csrf_token %}
-                <button type="submit" class="logout-btn">🔒 Cerrar sesión</button>
-            </form>
+
+        <!-- Usuario + tema + logout -->
+        <div class="d-flex align-items-center gap-3">
+
+            <span>{{ request.user.username }}</span>
+
+            <button id="themeToggle" class="btn btn-sm">
+                🌓 Tema
+            </button>
+
+            <!-- ⭐ BOTÓN NUEVO: CERRAR SESIÓN ⭐ -->
+            <a href="/logout/" class="btn btn-danger btn-sm">
+                🔒 Cerrar sesión
+            </a>
+
         </div>
-    </header>
+    </div>
+</nav>
 
-    <main>
-        {% block contenido %}
-        {% endblock %}
-    </main>
+<!--  ⭐ Pantalla completa ⭐ -->
+<div class="container-fluid p-2" style="max-width: 100%;">
+    {% block contenido %}
+    {% endblock %}
+</div>
 
-    <footer>
-        ImperYo Sport © {{ now|date:"Y" }}
-    </footer>
+<footer class="footer-custom">
+    ImperYo Sport © {{ now|date:"Y" }}
+</footer>
 
-    <script>
-        // Tema oscuro
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            // Guardar preferencia en localStorage
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('theme', 'dark');
-            } else {
-                localStorage.setItem('theme', 'light');
-            }
-        }
-        
-        // Cargar tema al iniciar
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-            }
-        });
-    </script>
+<!-- Tema claro/oscuro -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const saved = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+
+    const toggleButton = document.getElementById("themeToggle");
+    toggleButton.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        const next = current === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+    });
+});
+</script>
+
+<!-- PWA: Registrar Service Worker -->
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("{% static 'serviceworker.js' %}");
+}
+</script>
+
 </body>
 </html>

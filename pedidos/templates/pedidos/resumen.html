@@ -1,54 +1,58 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-<!-- Menú de navegación -->
-<nav class="navbar-nav-horizontal mb-4">
     {% if request.resolver_match.url_name != 'pedidos_home' %}
-    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
+    <a href="{% url 'pedidos_home' %}">🏠 Inicio</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'agenda' %}
-    <a href="{% url 'agenda' %}" class="nav-item {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}">📅 Agenda</a>
+    <a href="{% url 'agenda' %}">📅 Agenda</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'posibles_clientes' %}
-    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    <a href="{% url 'posibles_clientes' %}">👥 Posibles clientes</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'gastos' %}
-    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    <a href="{% url 'gastos' %}">💰 Gastos</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'configuracion' %}
-    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
+    <a href="{% url 'configuracion' %}">⚙️ Configuración</a>
     {% endif %}
-</nav>
 
-<h2>📋 Resumen de pedidos ({{ pedidos|length }})</h2>
+<h1>📋 Resumen de pedidos ({{ pedidos|length }})</h1>
 
-<div class="card-custom mb-4">
-    <h5 class="section-title mb-3">Filtros</h5>
+<div class="filtros-contenedor">
+    <h2>🔍 Filtros</h2>
     
-    <div class="mb-3">
+    <div class="filtro-seccion">
         <strong>Filtrar por estado:</strong>
         {% for estado in estados_todos %}
-            <button class="btn btn-sm btn-outline-secondary" onclick="filtrarPorEstado('{{ estado }}')">
-                {{ estado }}
-            </button>
+        <label class="checkbox-estado">
+            <input 
+                type="checkbox" 
+                name="filtro_estado" 
+                value="{{ estado }}"
+                class="filtro-checkbox"
+            >
+            {{ estado }}
+        </label>
         {% endfor %}
-        <button class="btn btn-sm btn-outline-secondary" onclick="limpiarFiltros()">↺ Limpiar</button>
+        <button onclick="limpiarFiltros()" class="btn-limpiar">↺ Limpiar</button>
     </div>
-
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label>Club contiene:</label>
-            <input type="text" id="filtro-club" class="form-control" onkeyup="filtrarTabla()">
-        </div>
-        <div class="col-md-6 mb-3">
-            <label>Teléfono contiene:</label>
-            <input type="text" id="filtro-telefono" class="form-control" onkeyup="filtrarTabla()">
-        </div>
+    
+    <div class="filtro-seccion">
+        <label>
+            <strong>Club contiene:</strong>
+            <input type="text" id="filtro_club" placeholder="Ej: Amigos de la tercera edad" class="filtro-input">
+        </label>
+        
+        <label>
+            <strong>Teléfono contiene:</strong>
+            <input type="text" id="filtro_telefono" placeholder="Ej: 612" class="filtro-input">
+        </label>
     </div>
 </div>
 
 {% if pedidos %}
-<table class="table-home table table-striped">
+<table class="tabla-pedidos">
     <thead>
         <tr>
             <th>ID</th>
@@ -65,9 +69,9 @@
             <th>Acciones</th>
         </tr>
     </thead>
-    <tbody id="tabla-pedidos-body">
+    <tbody>
         {% for p in pedidos %}
-        <tr>
+        <tr data-estados='{{ p.Estados_json|safe }}'>
             <td>{{ p.ID }}</td>
             <td>{{ p.Club }}</td>
             <td>{{ p.Cliente }}</td>
@@ -86,49 +90,190 @@
             <td>{{ p.Fecha_finalizacion|default:"—" }}</td>
             <td>{{ p.Estados_iconos|safe }}</td>
             <td>
-                <a href="{% url 'pedido_detalle' p.ID %}" class="btn btn-sm btn-info">Ver</a>
+                <a href="{% url 'pedido_detalle' p.ID %}">Ver</a>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 {% else %}
-<div class="card-custom">
-    <p>No hay pedidos.</p>
-</div>
+<p>No hay pedidos.</p>
 {% endif %}
 
+<style>
+.filtros-contenedor {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.filtro-seccion {
+    margin: 10px 0;
+}
+
+.filtro-seccion label {
+    display: inline-block;
+    margin-right: 15px;
+    margin-bottom: 8px;
+}
+
+.checkbox-estado {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 8px;
+    padding: 5px 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.checkbox-estado input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.filtro-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-left: 10px;
+    width: 250px;
+}
+
+.btn-limpiar {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 15px;
+    font-weight: bold;
+}
+
+.btn-limpiar:hover {
+    background: #cc0000;
+}
+
+.tabla-pedidos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabla-pedidos th,
+.tabla-pedidos td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.tabla-pedidos th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+}
+
+.tabla-pedidos tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.tabla-pedidos tr:hover {
+    background-color: #f0f0f0;
+}
+
+.tabla-pedidos a {
+    color: #2196F3;
+    text-decoration: none;
+}
+
+.tabla-pedidos a:hover {
+    text-decoration: underline;
+}
+</style>
+
 <script>
-function filtrarPorEstado(estado) {
-    const rows = document.querySelectorAll('#tabla-pedidos-body tr');
-    rows.forEach(row => {
-        const estadosJson = row.querySelector('td:nth-child(11)').dataset.estados;
-        const estados = JSON.parse(estadosJson || '[]');
-        row.style.display = estados.includes(estado) ? '' : 'none';
-    });
-}
-
-function limpiarFiltros() {
-    document.getElementById('filtro-club').value = '';
-    document.getElementById('filtro-telefono').value = '';
-    const rows = document.querySelectorAll('#tabla-pedidos-body tr');
-    rows.forEach(row => row.style.display = '');
-}
-
-function filtrarTabla() {
-    const club = document.getElementById('filtro-club').value.toLowerCase();
-    const telefono = document.getElementById('filtro-telefono').value.toLowerCase();
-    const rows = document.querySelectorAll('#tabla-pedidos-body tr');
+document.addEventListener('DOMContentLoaded', function() {
     
-    rows.forEach(row => {
-        const clubCell = row.cells[1].textContent.toLowerCase();
-        const telCell = row.cells[3].textContent.toLowerCase();
-        
-        const mostrar = (!club || clubCell.includes(club)) && 
-                        (!telefono || telCell.includes(telefono));
-        row.style.display = mostrar ? '' : 'none';
+    // 1️⃣ FILTRO POR ESTADOS (checkboxes)
+    const estadoCheckboxes = document.querySelectorAll('.filtro-checkbox');
+    estadoCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', aplicarFiltros);
     });
-}
+    
+    // 2️⃣ FILTRO POR CLUB (input de texto)
+    const filtroClub = document.getElementById('filtro_club');
+    if (filtroClub) {
+        filtroClub.addEventListener('input', aplicarFiltros);
+    }
+    
+    // 3️⃣ FILTRO POR TELÉFONO (input de texto)
+    const filtroTelefono = document.getElementById('filtro_telefono');
+    if (filtroTelefono) {
+        filtroTelefono.addEventListener('input', aplicarFiltros);
+    }
+    
+    // ✅ APLICAR FILTROS
+    function aplicarFiltros() {
+        const estadosSeleccionados = Array.from(estadoCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value.trim());
+        
+        const clubBuscar = filtroClub ? filtroClub.value.toLowerCase().trim() : '';
+        const telefonoBuscar = filtroTelefono ? filtroTelefono.value.toLowerCase().trim() : '';
+        
+        const filas = document.querySelectorAll('table tbody tr');
+        
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            if (celdas.length < 11) return;
+            
+            // Extraer datos de la fila
+            const club = celdas[1].textContent.toLowerCase().trim();
+            const telefono = celdas[3].textContent.toLowerCase().trim();
+            const estadosJson = fila.getAttribute('data-estados');
+            
+            let mostrar = true;
+            
+            // 🔹 Filtro por estados
+            if (estadosSeleccionados.length > 0 && estadosJson) {
+                try {
+                    const estadosFila = JSON.parse(estadosJson);
+                    const tieneAlgunEstado = estadosSeleccionados.some(est => 
+                        estadosFila.includes(est.trim())
+                    );
+                    if (!tieneAlgunEstado) mostrar = false;
+                } catch (e) {
+                    console.error('Error parseando estados:', e);
+                }
+            }
+            
+            // 🔹 Filtro por club
+            if (clubBuscar && !club.includes(clubBuscar)) {
+                mostrar = false;
+            }
+            
+            // 🔹 Filtro por teléfono
+            if (telefonoBuscar && !telefono.includes(telefonoBuscar)) {
+                mostrar = false;
+            }
+            
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+    
+    // 🧹 LIMPIAR FILTROS
+    window.limpiarFiltros = function() {
+        estadoCheckboxes.forEach(cb => cb.checked = false);
+        if (filtroClub) filtroClub.value = '';
+        if (filtroTelefono) filtroTelefono.value = '';
+        aplicarFiltros();
+    };
+    
+    // 🎯 APLICAR FILTROS INICIALMENTE
+    aplicarFiltros();
+});
 </script>
 
 {% endblock %}

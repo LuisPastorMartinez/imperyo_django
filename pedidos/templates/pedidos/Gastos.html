@@ -4,6 +4,10 @@
 <nav class="navbar-nav-horizontal mb-4">
     <a href="{% url 'pedidos_home' %}" class="nav-item">🏠 Inicio</a>
     <a href="{% url 'agenda' %}" class="nav-item">📅 Agenda</a>
+{% if request.resolver_match.url_name != 'tareas' %}
+    <a href="{% url 'tareas' %}" class="nav-item {% if request.resolver_match.url_name == 'tareas' %}active{% endif %}">✅ Tareas</a>
+    {% endif %}
+
     <a href="{% url 'posibles_clientes' %}" class="nav-item">👥 Posibles clientes</a>
     <a href="{% url 'resumen' %}" class="nav-item">📊 Resumen</a>
     <a href="{% url 'configuracion' %}" class="nav-item">⚙️ Configuración</a>

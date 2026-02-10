@@ -9,6 +9,10 @@
     {% if request.resolver_match.url_name != 'agenda' %}
     <a href="{% url 'agenda' %}" class="nav-item {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}">📅 Agenda</a>
     {% endif %}
+{% if request.resolver_match.url_name != 'tareas' %}
+    <a href="{% url 'tareas' %}" class="nav-item {% if request.resolver_match.url_name == 'tareas' %}active{% endif %}">✅ Tareas</a>
+    {% endif %}
+
     {% if request.resolver_match.url_name != 'gastos' %}
     <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
     {% endif %}

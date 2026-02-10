@@ -628,9 +628,10 @@ def agenda_eliminar(request, cita_id):
         return redirect('agenda')
     
     return redirect('agenda')
-============================================
-🔹 TAREAS (PÁGINA INDEPENDIENTE)
-============================================
+
+# ============================================
+# 🔹 TAREAS (PÁGINA INDEPENDIENTE)
+# ============================================
 @login_required
 def tareas(request):
     """Página principal de tareas"""

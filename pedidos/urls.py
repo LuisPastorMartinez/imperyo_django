@@ -16,4 +16,11 @@ urlpatterns = [
     path('agenda/', views.agenda, name='agenda'),
     path('agenda/guardar/', views.agenda_guardar, name='agenda_guardar'),
     path('agenda/eliminar/<str:cita_id>/', views.agenda_eliminar, name='agenda_eliminar')
+
+    # Tareas de la agenda
+    path('agenda/tareas/', views.agenda_tareas_listar, name='agenda_tareas_listar'),
+    path('agenda/tareas/guardar/', views.agenda_tareas_guardar, name='agenda_tareas_guardar'),
+    path('agenda/tareas/completar/<str:tarea_id>/', views.agenda_tareas_completar,          name='agenda_tareas_completar'),
+    path('agenda/tareas/eliminar/<str:tarea_id>/', views.agenda_tareas_eliminar, name='agenda_tareas_eliminar'),
+ 
 ]

@@ -628,3 +628,106 @@ def agenda_eliminar(request, cita_id):
         return redirect('agenda')
     
     return redirect('agenda')
+# ============================================
+# 🔹 TAREAS DE LA AGENDA
+# ============================================
+
+@login_required
+def agenda_tareas_listar(request):
+    """Listar todas las tareas (pendientes y completadas)"""
+    try:
+        db = get_firestore_client()
+        tareas_ref = db.collection("tareas").order_by("fecha_creacion", direction=firestore.Query.DESCENDING)
+        docs = tareas_ref.stream()
+        
+        tareas = []
+        for doc in docs:
+            data = doc.to_dict()
+            data["id"] = doc.id
+            tareas.append(data)
+        
+        return JsonResponse({"tareas": tareas}, safe=False)
+    
+    except Exception as e:
+        print(f"Error al listar tareas: {e}")
+        return JsonResponse({"tareas": []}, safe=False)
+
+
+@login_required
+def agenda_tareas_guardar(request):
+    """Crear nueva tarea"""
+    if request.method == 'POST':
+        try:
+            db = get_firestore_client()
+            
+            cliente_club = request.POST.get('cliente_club', '').strip()
+            descripcion = request.POST.get('descripcion', '').strip()
+            
+            if not cliente_club or not descripcion:
+                return JsonResponse({"error": "Cliente/Club y descripción son obligatorios"}, status=400)
+            
+            data = {
+                "cliente_club": cliente_club,
+                "descripcion": descripcion,
+                "completada": False,
+                "fecha_creacion": datetime.now().isoformat(),
+                "usuario": request.user.username
+            }
+            
+            # Crear nueva tarea
+            db.collection("tareas").add(data)
+            
+            return JsonResponse({"success": True, "message": "Tarea creada correctamente"})
+        
+        except Exception as e:
+            print(f"Error al guardar tarea: {e}")
+            return JsonResponse({"error": str(e)}, status=500)
+    
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+@login_required
+def agenda_tareas_completar(request, tarea_id):
+    """Marcar tarea como completada"""
+    if request.method == 'POST':
+        try:
+            db = get_firestore_client()
+            
+            tarea_ref = db.collection("tareas").document(tarea_id)
+            doc = tarea_ref.get()
+            
+            if not doc.exists:
+                return JsonResponse({"error": "Tarea no encontrada"}, status=404)
+            
+            # Marcar como completada
+            tarea_ref.update({
+                "completada": True,
+                "fecha_completada": datetime.now().isoformat()
+            })
+            
+            return JsonResponse({"success": True, "message": "Tarea completada"})
+        
+        except Exception as e:
+            print(f"Error al completar tarea: {e}")
+            return JsonResponse({"error": str(e)}, status=500)
+    
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
+@login_required
+def agenda_tareas_eliminar(request, tarea_id):
+    """Eliminar tarea"""
+    if request.method == 'POST':
+        try:
+            db = get_firestore_client()
+            
+            # Eliminar tarea
+            db.collection("tareas").document(tarea_id).delete()
+            
+            return JsonResponse({"success": True, "message": "Tarea eliminada"})
+        
+        except Exception as e:
+            print(f"Error al eliminar tarea: {e}")
+            return JsonResponse({"error": str(e)}, status=500)
+    
+    return JsonResponse({"error": "Método no permitido"}, status=405)

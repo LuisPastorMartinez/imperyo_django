@@ -62,7 +62,7 @@
 {% endif %}
 
 <!-- ============================================ -->
-<!-- 🔹 NUEVA SECCIÓN: TAREAS DIARIAS -->
+<!-- 🔹 NUEVA SECCIÓN: TAREAS DIARIAS (FIREBASE) -->
 <!-- ============================================ -->
 <div style="margin-top: 40px; padding: 20px; background: #f0f8ff; border-radius: 10px; border: 2px solid #4682b4;">
     <h2 style="color: #2c3e50; margin-bottom: 20px;">✅ Lista de Tareas</h2>
@@ -106,20 +106,18 @@
     
     <!-- Lista de tareas -->
     <div id="listaTareasContainer">
-        <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Tareas Pendientes (0)</h3>
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Tareas Pendientes (<span id="contadorTareas">0</span>)</h3>
         <div id="listaTareas" style="display: flex; flex-direction: column; gap: 10px;">
-            <!-- Las tareas se cargarán aquí dinámicamente -->
-            <p id="mensajeVacio" style="text-align: center; color: #7f8c8d; font-style: italic;">📭 No hay tareas pendientes</p>
+            <p id="mensajeVacio" style="text-align: center; color: #7f8c8d; font-style: italic;">📭 Cargando tareas...</p>
         </div>
     </div>
 </div>
 
 <script>
 // ============================================
-// 🔹 FUNCIONALIDAD DE TAREAS
+// 🔹 FUNCIONALIDAD DE TAREAS (FIREBASE)
 // ============================================
 
-// Cargar tareas al iniciar
 document.addEventListener('DOMContentLoaded', function() {
     cargarTareas();
     
@@ -131,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 🔹 Agregar nueva tarea
-function agregarTarea() {
+async function agregarTarea() {
     const clienteClub = document.getElementById('tareaClienteClub').value.trim();
     const descripcion = document.getElementById('tareaDescripcion').value.trim();
     
@@ -140,122 +138,175 @@ function agregarTarea() {
         return;
     }
     
-    // Crear objeto tarea
-    const tarea = {
-        id: 'tarea_' + Date.now(),
-        clienteClub: clienteClub,
-        descripcion: descripcion,
-        completada: false,
-        fechaCreacion: new Date().toISOString()
-    };
-    
-    // Guardar en localStorage (simulación hasta que se integre con Firebase)
-    let tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
-    tareas.push(tarea);
-    localStorage.setItem('tareasDiarias', JSON.stringify(tareas));
-    
-    // Limpiar formulario
-    document.getElementById('tareaClienteClub').value = '';
-    document.getElementById('tareaDescripcion').value = '';
-    
-    // Recargar lista
-    cargarTareas();
-    
-    alert('✅ Tarea añadida correctamente');
+    try {
+        const formData = new FormData();
+        formData.append('cliente_club', clienteClub);
+        formData.append('descripcion', descripcion);
+        
+        const response = await fetch('{% url "agenda_tareas_guardar" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Limpiar formulario
+            document.getElementById('tareaClienteClub').value = '';
+            document.getElementById('tareaDescripcion').value = '';
+            
+            // Recargar lista
+            cargarTareas();
+            
+            alert('✅ Tarea añadida correctamente');
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo guardar la tarea'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar la tarea');
+    }
 }
 
 // 🔹 Cargar tareas
-function cargarTareas() {
-    const tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
-    const lista = document.getElementById('listaTareas');
-    const mensajeVacio = document.getElementById('mensajeVacio');
-    const contador = document.querySelector('#listaTareasContainer h3');
-    
-    // Filtrar tareas pendientes
-    const tareasPendientes = tareas.filter(t => !t.completada);
-    
-    // Actualizar contador
-    contador.textContent = `📋 Tareas Pendientes (${tareasPendientes.length})`;
-    
-    // Limpiar lista
-    lista.innerHTML = '';
-    
-    if (tareasPendientes.length === 0) {
-        lista.appendChild(mensajeVacio);
-        return;
+async function cargarTareas() {
+    try {
+        const response = await fetch('{% url "agenda_tareas_listar" %}');
+        const data = await response.json();
+        
+        const tareas = data.tareas || [];
+        const lista = document.getElementById('listaTareas');
+        const mensajeVacio = document.getElementById('mensajeVacio');
+        const contador = document.getElementById('contadorTareas');
+        
+        // Filtrar tareas pendientes
+        const tareasPendientes = tareas.filter(t => !t.completada);
+        
+        // Actualizar contador
+        contador.textContent = tareasPendientes.length;
+        
+        // Limpiar lista
+        lista.innerHTML = '';
+        
+        if (tareasPendientes.length === 0) {
+            mensajeVacio.textContent = '📭 No hay tareas pendientes';
+            lista.appendChild(mensajeVacio);
+            return;
+        }
+        
+        // Mostrar tareas
+        tareasPendientes.forEach(tarea => {
+            const tareaDiv = document.createElement('div');
+            tareaDiv.style.cssText = `
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 4px solid #3498db;
+            `;
+            
+            // Formatear fecha
+            let fechaTexto = '📅 Sin fecha';
+            if (tarea.fecha_creacion) {
+                const fecha = new Date(tarea.fecha_creacion);
+                fechaTexto = `📅 ${fecha.toLocaleDateString('es-ES')}`;
+            }
+            
+            tareaDiv.innerHTML = `
+                <div style="flex: 1;">
+                    <strong style="color: #2c3e50; font-size: 16px;">${tarea.cliente_club}</strong>
+                    <br>
+                    <span style="color: #7f8c8d;">${tarea.descripcion}</span>
+                    <br>
+                    <small style="color: #95a5a6; font-size: 12px;">
+                        ${fechaTexto}
+                    </small>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button 
+                        onclick="completarTarea('${tarea.id}')" 
+                        style="background: #27ae60; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+                        title="Marcar como completada"
+                    >
+                        ✅
+                    </button>
+                    <button 
+                        onclick="eliminarTarea('${tarea.id}')" 
+                        style="background: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+                        title="Eliminar tarea"
+                    >
+                        🗑️
+                    </button>
+                </div>
+            `;
+            
+            lista.appendChild(tareaDiv);
+        });
+    } catch (error) {
+        console.error('Error al cargar tareas:', error);
+        const lista = document.getElementById('listaTareas');
+        lista.innerHTML = '<p style="text-align: center; color: #e74c3c;">❌ Error al cargar las tareas</p>';
     }
-    
-    // Mostrar tareas
-    tareasPendientes.forEach(tarea => {
-        const tareaDiv = document.createElement('div');
-        tareaDiv.style.cssText = `
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #3498db;
-        `;
-        
-        tareaDiv.innerHTML = `
-            <div style="flex: 1;">
-                <strong style="color: #2c3e50; font-size: 16px;">${tarea.clienteClub}</strong>
-                <br>
-                <span style="color: #7f8c8d;">${tarea.descripcion}</span>
-                <br>
-                <small style="color: #95a5a6; font-size: 12px;">
-                    📅 ${new Date(tarea.fechaCreacion).toLocaleDateString('es-ES')}
-                </small>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button 
-                    onclick="completarTarea('${tarea.id}')" 
-                    style="background: #27ae60; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
-                    title="Marcar como completada"
-                >
-                    ✅
-                </button>
-                <button 
-                    onclick="eliminarTarea('${tarea.id}')" 
-                    style="background: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
-                    title="Eliminar tarea"
-                >
-                    🗑️
-                </button>
-            </div>
-        `;
-        
-        lista.appendChild(tareaDiv);
-    });
 }
 
 // 🔹 Completar tarea
-function completarTarea(id) {
+async function completarTarea(id) {
     if (!confirm('¿Marcar esta tarea como completada?')) return;
     
-    let tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
-    const tarea = tareas.find(t => t.id === id);
-    
-    if (tarea) {
-        tarea.completada = true;
-        tarea.fechaCompletada = new Date().toISOString();
-        localStorage.setItem('tareasDiarias', JSON.stringify(tareas));
-        cargarTareas();
-        alert('✅ Tarea completada');
+    try {
+        const response = await fetch(`{% url "agenda_tareas_completar" "PLACEHOLDER" %}`.replace('PLACEHOLDER', id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            cargarTareas();
+            alert('✅ Tarea completada');
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo completar la tarea'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al completar la tarea');
     }
 }
 
 // 🔹 Eliminar tarea
-function eliminarTarea(id) {
+async function eliminarTarea(id) {
     if (!confirm('¿Eliminar esta tarea?')) return;
     
-    let tareas = JSON.parse(localStorage.getItem('tareasDiarias') || '[]');
-    tareas = tareas.filter(t => t.id !== id);
-    localStorage.setItem('tareasDiarias', JSON.stringify(tareas));
-    cargarTareas();
-    alert('🗑️ Tarea eliminada');
+    try {
+        const response = await fetch(`{% url "agenda_tareas_eliminar" "PLACEHOLDER" %}`.replace('PLACEHOLDER', id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            cargarTareas();
+            alert('🗑️ Tarea eliminada');
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo eliminar la tarea'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar la tarea');
+    }
 }
 </script>
 

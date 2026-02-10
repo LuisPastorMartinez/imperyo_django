@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+
+    {% if request.resolver_match.url_name != 'pedidos_home' %}
+    
+[🏠 Inicio]({% url 'pedidos_home' %})
+    {% endif %}
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    
+[👥 Posibles clientes]({% url 'posibles_clientes' %})
+    {% endif %}
+    {% if request.resolver_match.url_name != 'gastos' %}
+    
+[💰 Gastos]({% url 'gastos' %})
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    
+[📊 Resumen]({% url 'resumen' %})
+    {% endif %}
+    {% if request.resolver_match.url_name != 'configuracion' %}
+    
+[⚙️ Configuración]({% url 'configuracion' %})
+    {% endif %}
+📅 Agenda
+    ➕ Nueva cita
+    {% if citas_hoy_count > 0 %}
+        {{ citas_hoy_count }} hoy
+    {% endif %}
+📝 Nueva cita
+        {% csrf_token %}
+        
+         Fecha * Hora * Cliente * Teléfono * Tipo * — Seleccionar — Nuevo cliente Cliente existente Seguimiento Reunión Club Notas 💾 Guardar Cancelar 
+{% if citas %}
+📋 Citas ({{ citas|length }})
+| Fecha
+|Hora
+|Cliente
+|Teléfono
+|Club
+|Tipo
+|Notas
+|Acciones
+|
+| ---|---|---|---|---|---|---|---|
+            {% for c in citas %}
+            
+| {{ c.Fecha|default:"—" }}
+|{{ c.Hora|default:"—" }}
+|{{ c.Cliente|default:"—" }}
+|{{ c.Telefono|default:"—" }}
+|{{ c.Club|default:"—" }}
+|{{ c.Tipo|default:"—" }}
+|{{ c.Notas|default:"—" }}
+|  [🗑️]({% url 'agenda_eliminar' c.ID %})  
+|
+| ---|---|---|---|---|---|---|---|
+            {% endfor %}
+        
+{% else %}
+📭 No hay citas programadas
+{% endif %}
+
+<!-- ============================================ -->
+<!-- 🔹 NUEVA SECCIÓN: TAREAS DIARIAS (FIREBASE) -->
+<!-- ============================================ -->
+<div style="margin-top: 40px; padding: 20px; background: #f0f8ff; border-radius: 10px; border: 2px solid #4682b4;">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">✅ Lista de Tareas</h2>
+    
+    <!-- Formulario para nueva tarea -->
+    <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3 style="color: #3498db; margin-bottom: 15px;">➕ Nueva Tarea</h3>
+        <form id="formTarea" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;">👤 Cliente / Club *</label>
+                <input 
+                    type="text" 
+                    id="tareaClienteClub" 
+                    placeholder="Ej: Amigos de la tercera edad"
+                    style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+                    required
+                >
+            </div>
+            
+            <div style="flex: 2; min-width: 300px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold; color: #2c3e50;">📝 Descripción de la tarea *</label>
+                <input 
+                    type="text" 
+                    id="tareaDescripcion" 
+                    placeholder="Ej: Llamar para confirmar pedido de camisetas"
+                    style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+                    required
+                >
+            </div>
+            
+            <button 
+                type="submit" 
+                style="background: #27ae60; color: white; padding: 12px 25px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.3s;"
+                onmouseover="this.style.background='#229954'" 
+                onmouseout="this.style.background='#27ae60'"
+            >
+                📥 Añadir Tarea
+            </button>
+        </form>
+    </div>
+    
+    <!-- Lista de tareas -->
+    <div id="listaTareasContainer">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Tareas Pendientes (<span id="contadorTareas">0</span>)</h3>
+        <div id="listaTareas" style="display: flex; flex-direction: column; gap: 10px;">
+            <p id="mensajeVacio" style="text-align: center; color: #7f8c8d; font-style: italic;">📭 Cargando tareas...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// 🔹 FUNCIONALIDAD DE TAREAS (FIREBASE)
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    cargarTareas();
+    
+    // Manejar formulario
+    document.getElementById('formTarea').addEventListener('submit', function(e) {
+        e.preventDefault();
+        agregarTarea();
+    });
+});
+
+// 🔹 Agregar nueva tarea
+async function agregarTarea() {
+    const clienteClub = document.getElementById('tareaClienteClub').value.trim();
+    const descripcion = document.getElementById('tareaDescripcion').value.trim();
+    
+    if (!clienteClub || !descripcion) {
+        alert('⚠️ Por favor, completa ambos campos');
+        return;
+    }
+    
+    try {
+        const formData = new FormData();
+        formData.append('cliente_club', clienteClub);
+        formData.append('descripcion', descripcion);
+        
+        const response = await fetch('{% url "agenda_tareas_guardar" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Limpiar formulario
+            document.getElementById('tareaClienteClub').value = '';
+            document.getElementById('tareaDescripcion').value = '';
+            
+            // Recargar lista
+            cargarTareas();
+            
+            alert('✅ Tarea añadida correctamente');
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo guardar la tarea'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al guardar la tarea');
+    }
+}
+
+// 🔹 Cargar tareas
+async function cargarTareas() {
+    try {
+        const response = await fetch('{% url "agenda_tareas_listar" %}');
+        const data = await response.json();
+        
+        const tareas = data.tareas || [];
+        const lista = document.getElementById('listaTareas');
+        const mensajeVacio = document.getElementById('mensajeVacio');
+        const contador = document.getElementById('contadorTareas');
+        
+        // Filtrar tareas pendientes
+        const tareasPendientes = tareas.filter(t => !t.completada);
+        
+        // Actualizar contador
+        contador.textContent = tareasPendientes.length;
+        
+        // Limpiar lista
+        lista.innerHTML = '';
+        
+        if (tareasPendientes.length === 0) {
+            mensajeVacio.textContent = '📭 No hay tareas pendientes';
+            lista.appendChild(mensajeVacio);
+            return;
+        }
+        
+        // Mostrar tareas
+        tareasPendientes.forEach(tarea => {
+            const tareaDiv = document.createElement('div');
+            tareaDiv.style.cssText = `
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-left: 4px solid #3498db;
+            `;
+            
+            // Formatear fecha
+            let fechaTexto = '📅 Sin fecha';
+            if (tarea.fecha_creacion) {
+                const fecha = new Date(tarea.fecha_creacion);
+                fechaTexto = `📅 ${fecha.toLocaleDateString('es-ES')}`;
+            }
+            
+            tareaDiv.innerHTML = `
+                <div style="flex: 1;">
+                    <strong style="color: #2c3e50; font-size: 16px;">${tarea.cliente_club}</strong>
+                    <br>
+                    <span style="color: #7f8c8d;">${tarea.descripcion}</span>
+                    <br>
+                    <small style="color: #95a5a6; font-size: 12px;">
+                        ${fechaTexto}
+                    </small>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button 
+                        onclick="completarTarea('${tarea.id}')" 
+                        style="background: #27ae60; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+                        title="Marcar como completada"
+                    >
+                        ✅
+                    </button>
+                    <button 
+                        onclick="eliminarTarea('${tarea.id}')" 
+                        style="background: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;"
+                        title="Eliminar tarea"
+                    >
+                        🗑️
+                    </button>
+                </div>
+            `;
+            
+            lista.appendChild(tareaDiv);
+        });
+    } catch (error) {
+        console.error('Error al cargar tareas:', error);
+        const lista = document.getElementById('listaTareas');
+        lista.innerHTML = '<p style="text-align: center; color: #e74c3c;">❌ Error al cargar las tareas</p>';
+    }
+}
+
+// 🔹 Completar tarea
+async function completarTarea(id) {
+    if (!confirm('¿Marcar esta tarea como completada?')) return;
+    
+    try {
+        const response = await fetch(`{% url "agenda_tareas_completar" "PLACEHOLDER" %}`.replace('PLACEHOLDER', id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            cargarTareas();
+            alert('✅ Tarea completada');
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo completar la tarea'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al completar la tarea');
+    }
+}
+
+// 🔹 Eliminar tarea
+async function eliminarTarea(id) {
+    if (!confirm('¿Eliminar esta tarea?')) return;
+    
+    try {
+        const response = await fetch(`{% url "agenda_tareas_eliminar" "PLACEHOLDER" %}`.replace('PLACEHOLDER', id), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            cargarTareas();
+            alert('🗑️ Tarea eliminada');
+        } else {
+            alert('❌ Error: ' + (data.error || 'No se pudo eliminar la tarea'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al eliminar la tarea');
+    }
+}
+</script>
+
+[⬅️ Volver a Inicio]({% url 'pedidos_home' %})
+{% endblock %}

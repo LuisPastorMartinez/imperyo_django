@@ -101,7 +101,7 @@
 
 <!-- Script para manejar las tareas -->
 <script>
-    // URLs base (construidas en el servidor Django)
+    // URLs base
     const URL_TAREAS_LISTAR = '{% url "agenda_tareas_listar" %}';
     const URL_TAREAS_GUARDAR = '{% url "agenda_tareas_guardar" %}';
     
@@ -126,11 +126,11 @@
                                         Creada: ${new Date(tarea.fecha_creacion).toLocaleString()}
                                     </small>
                                     <div>
-                                        <button onclick="completarTarea(${tarea.id})" 
+                                        <button onclick="completarTarea('${tarea.id}')" 
                                                 style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">
                                             ✓ Completar
                                         </button>
-                                        <button onclick="eliminarTarea(${tarea.id})" 
+                                        <button onclick="eliminarTarea('${tarea.id}')" 
                                                 style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
                                             🗑️ Eliminar
                                         </button>
@@ -171,7 +171,7 @@
                 document.getElementById('formTarea').reset();
                 cargarTareas();
             } else {
-                alert('Error: ' + data.error);
+                alert('Error: ' + (data.error || data.message));
             }
         })
         .catch(error => {
@@ -197,7 +197,7 @@
             if (data.success) {
                 cargarTareas();
             } else {
-                alert('Error: ' + data.error);
+                alert('Error: ' + (data.error || data.message));
             }
         })
         .catch(error => {
@@ -223,7 +223,7 @@
             if (data.success) {
                 cargarTareas();
             } else {
-                alert('Error: ' + data.error);
+                alert('Error: ' + (data.error || data.message));
             }
         })
         .catch(error => {

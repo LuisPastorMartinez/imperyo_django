@@ -13,14 +13,16 @@ urlpatterns = [
     path("gastos/", views.gastos, name="gastos"),
     path("resumen/", views.resumen, name="resumen"),
     path("configuracion/", views.configuracion, name="configuracion"),
+    
+    # Agenda (citas)
     path('agenda/', views.agenda, name='agenda'),
     path('agenda/guardar/', views.agenda_guardar, name='agenda_guardar'),
     path('agenda/eliminar/<str:cita_id>/', views.agenda_eliminar, name='agenda_eliminar'),
-
-    # Tareas de la agenda
-    path('agenda/tareas/', views.agenda_tareas_listar, name='agenda_tareas_listar'),
-    path('agenda/tareas/guardar/', views.agenda_tareas_guardar, name='agenda_tareas_guardar'),
-    path('agenda/tareas/completar/<str:tarea_id>/', views.agenda_tareas_completar,          name='agenda_tareas_completar'),
-    path('agenda/tareas/eliminar/<str:tarea_id>/', views.agenda_tareas_eliminar, name='agenda_tareas_eliminar'),
- 
+    
+    # Tareas (página independiente)
+    path('tareas/', views.tareas, name='tareas'),
+    path('tareas/listar/', views.tareas_listar, name='tareas_listar'),
+    path('tareas/guardar/', views.tareas_guardar, name='tareas_guardar'),
+    path('tareas/completar/<str:tarea_id>/', views.tareas_completar, name='tareas_completar'),
+    path('tareas/eliminar/<str:tarea_id>/', views.tareas_eliminar, name='tareas_eliminar'),
 ]

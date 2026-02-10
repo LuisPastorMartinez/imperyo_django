@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<!-- Barra de navegación -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+        {% if request.resolver_match.url_name != 'pedidos_home' %}
+        <a href="{% url 'pedidos_home' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">🏠 Inicio</a>
+        {% endif %}
+        {% if request.resolver_match.url_name != 'posibles_clientes' %}
+        <a href="{% url 'posibles_clientes' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">👥 Posibles clientes</a>
+        {% endif %}
+        {% if request.resolver_match.url_name != 'gastos' %}
+        <a href="{% url 'gastos' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">💰 Gastos</a>
+        {% endif %}
+        {% if request.resolver_match.url_name != 'resumen' %}
+        <a href="{% url 'resumen' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">📊 Resumen</a>
+        {% endif %}
+        {% if request.resolver_match.url_name != 'configuracion' %}
+        <a href="{% url 'configuracion' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">⚙️ Configuración</a>
+        {% endif %}
+        {% if request.resolver_match.url_name != 'agenda' %}
+        <a href="{% url 'agenda' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">📅 Agenda</a>
+        {% endif %}
+        <span style="display: inline-block; padding: 8px 16px; background-color: #28a745; color: white; border-radius: 4px;">✅ Tareas</span>
+    </div>
+</div>
+
+<!-- ========== SECCIÓN DE TAREAS ========== -->
+<div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <h2 style="margin: 0 0 20px 0; color: #28a745;">✅ Lista de Tareas</h2>
+
+    <!-- Formulario Nueva Tarea -->
+    <div style="background-color: #f8f9fa; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">➕ Nueva Tarea</h3>
+        <form id="formTarea" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; align-items: center;">
+            {% csrf_token %}
+            
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">👤 Cliente / Club *</label>
+                <input type="text" id="cliente_club" name="cliente_club" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div style="grid-column: span 2;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">📝 Descripción *</label>
+                <textarea id="descripcion" name="descripcion" rows="3" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+            
+            <div style="grid-column: span 2; display: flex; justify-content: flex-end;">
+                <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">📥 Añadir Tarea</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Tareas Pendientes -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">📋 Tareas Pendientes (<span id="tareasPendientesCount">0</span>)</h3>
+        
+        <div id="tareasPendientes">
+            <p style="color: #6c757d; text-align: center;">📭 Cargando tareas...</p>
+        </div>
+    </div>
+    
+    <!-- Lista de Tareas Completadas -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">✅ Tareas Completadas (<span id="tareasCompletadasCount">0</span>)</h3>
+        
+        <div id="tareasCompletadas">
+            <p style="color: #6c757d; text-align: center;">📭 Cargando tareas...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Botón de Volver -->
+<div style="text-align: center; margin-top: 20px;">
+    <a href="{% url 'pedidos_home' %}" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px;">
+        ⬅️ Volver a Inicio
+    </a>
+</div>
+
+<!-- Script para manejar las tareas -->
+<script>
+    // URLs base
+    const URL_TAREAS_LISTAR = '{% url "tareas_listar" %}';
+    const URL_TAREAS_GUARDAR = '{% url "tareas_guardar" %}';
+    
+    // Cargar tareas
+    function cargarTareas() {
+        fetch(URL_TAREAS_LISTAR)
+            .then(response => response.json())
+            .then(data => {
+                let tareasPendientes = data.tareas.filter(t => !t.completada);
+                let tareasCompletadas = data.tareas.filter(t => t.completada);
+                
+                // Renderizar tareas pendientes
+                let pendientesHtml = '';
+                if (tareasPendientes.length === 0) {
+                    pendientesHtml = '<div style="padding: 20px; text-align: center; color: #6c757d; background-color: white; border-radius: 4px;">📭 No hay tareas pendientes</div>';
+                } else {
+                    tareasPendientes.forEach(tarea => {
+                        pendientesHtml += `
+                            <div style="background-color: white; padding: 15px; margin-bottom: 10px; border-radius: 4px; border-left: 4px solid #007bff;">
+                                <h4 style="margin: 0 0 8px 0; color: #333;">${tarea.cliente_club}</h4>
+                                <p style="margin: 0 0 10px 0; color: #495057;">${tarea.descripcion}</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <small style="color: #6c757d;">
+                                        Creada: ${new Date(tarea.fecha_creacion).toLocaleString()}
+                                    </small>
+                                    <div>
+                                        <button onclick="completarTarea('${tarea.id}')" 
+                                                style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                                            ✓ Completar
+                                        </button>
+                                        <button onclick="eliminarTarea('${tarea.id}')" 
+                                                style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                // Renderizar tareas completadas
+                let completadasHtml = '';
+                if (tareasCompletadas.length === 0) {
+                    completadasHtml = '<div style="padding: 20px; text-align: center; color: #6c757d; background-color: white; border-radius: 4px;">📭 No hay tareas completadas</div>';
+                } else {
+                    tareasCompletadas.forEach(tarea => {
+                        completadasHtml += `
+                            <div style="background-color: white; padding: 15px; margin-bottom: 10px; border-radius: 4px; border-left: 4px solid #28a745; opacity: 0.7;">
+                                <h4 style="margin: 0 0 8px 0; color: #333;">${tarea.cliente_club}</h4>
+                                <p style="margin: 0 0 10px 0; color: #495057;">${tarea.descripcion}</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <small style="color: #6c757d;">
+                                        Completada: ${tarea.fecha_completada ? new Date(tarea.fecha_completada).toLocaleString() : '—'}
+                                    </small>
+                                    <div>
+                                        <button onclick="eliminarTarea('${tarea.id}')" 
+                                                style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                document.getElementById('tareasPendientes').innerHTML = pendientesHtml;
+                document.getElementById('tareasCompletadas').innerHTML = completadasHtml;
+                document.getElementById('tareasPendientesCount').textContent = tareasPendientes.length;
+                document.getElementById('tareasCompletadasCount').textContent = tareasCompletadas.length;
+            })
+            .catch(error => {
+                console.error('Error al cargar tareas:', error);
+                document.getElementById('tareasPendientes').innerHTML = '<div style="padding: 20px; text-align: center; color: #dc3545; background-color: white; border-radius: 4px;">❌ Error al cargar las tareas</div>';
+                document.getElementById('tareasCompletadas').innerHTML = '<div style="padding: 20px; text-align: center; color: #dc3545; background-color: white; border-radius: 4px;">❌ Error al cargar las tareas</div>';
+            });
+    }
+    
+    // Enviar nueva tarea
+    document.getElementById('formTarea').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const cliente_club = document.getElementById('cliente_club').value;
+        const descripcion = document.getElementById('descripcion').value;
+        
+        fetch(URL_TAREAS_GUARDAR, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `cliente_club=${encodeURIComponent(cliente_club)}&descripcion=${encodeURIComponent(descripcion)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('formTarea').reset();
+                cargarTareas();
+            } else {
+                alert('Error: ' + (data.error || data.message));
+            }
+        })
+        .catch(error => {
+            console.error('Error al crear tarea:', error);
+            alert('Error al crear la tarea');
+        });
+    });
+    
+    // Completar tarea
+    function completarTarea(tareaId) {
+        if (!confirm('¿Marcar esta tarea como completada?')) return;
+        
+        const url = `/pedidos/tareas/completar/${tareaId}/`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarTareas();
+            } else {
+                alert('Error: ' + (data.error || data.message));
+            }
+        })
+        .catch(error => {
+            console.error('Error al completar tarea:', error);
+            alert('Error al completar la tarea');
+        });
+    }
+    
+    // Eliminar tarea
+    function eliminarTarea(tareaId) {
+        if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
+        
+        const url = `/pedidos/tareas/eliminar/${tareaId}/`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cargarTareas();
+            } else {
+                alert('Error: ' + (data.error || data.message));
+            }
+        })
+        .catch(error => {
+            console.error('Error al eliminar tarea:', error);
+            alert('Error al eliminar la tarea');
+        });
+    }
+    
+    // Cargar tareas al cargar la página
+    document.addEventListener('DOMContentLoaded', cargarTareas);
+</script>
+
+{% endblock %}

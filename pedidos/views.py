@@ -628,12 +628,16 @@ def agenda_eliminar(request, cita_id):
         return redirect('agenda')
     
     return redirect('agenda')
-# ============================================
-# 🔹 TAREAS DE LA AGENDA
-# ============================================
+============================================
+🔹 TAREAS (PÁGINA INDEPENDIENTE)
+============================================
+@login_required
+def tareas(request):
+    """Página principal de tareas"""
+    return render(request, "pedidos/tareas.html")
 
 @login_required
-def agenda_tareas_listar(request):
+def tareas_listar(request):
     """Listar todas las tareas (pendientes y completadas)"""
     try:
         db = get_firestore_client()
@@ -652,9 +656,8 @@ def agenda_tareas_listar(request):
         print(f"Error al listar tareas: {e}")
         return JsonResponse({"tareas": []}, safe=False)
 
-
 @login_required
-def agenda_tareas_guardar(request):
+def tareas_guardar(request):
     """Crear nueva tarea"""
     if request.method == 'POST':
         try:
@@ -685,9 +688,8 @@ def agenda_tareas_guardar(request):
     
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
-
 @login_required
-def agenda_tareas_completar(request, tarea_id):
+def tareas_completar(request, tarea_id):
     """Marcar tarea como completada"""
     if request.method == 'POST':
         try:
@@ -713,9 +715,8 @@ def agenda_tareas_completar(request, tarea_id):
     
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
-
 @login_required
-def agenda_tareas_eliminar(request, tarea_id):
+def tareas_eliminar(request, tarea_id):
     """Eliminar tarea"""
     if request.method == 'POST':
         try:

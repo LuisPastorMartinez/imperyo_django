@@ -1,26 +1,20 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-
     {% if request.resolver_match.url_name != 'pedidos_home' %}
-    
-[🏠 Inicio]({% url 'pedidos_home' %})
+    [🏠 Inicio]({% url 'pedidos_home' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'posibles_clientes' %}
-    
-[👥 Posibles clientes]({% url 'posibles_clientes' %})
+    [👥 Posibles clientes]({% url 'posibles_clientes' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'gastos' %}
-    
-[💰 Gastos]({% url 'gastos' %})
+    [💰 Gastos]({% url 'gastos' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'resumen' %}
-    
-[📊 Resumen]({% url 'resumen' %})
+    [📊 Resumen]({% url 'resumen' %})
     {% endif %}
     {% if request.resolver_match.url_name != 'configuracion' %}
-    
-[⚙️ Configuración]({% url 'configuracion' %})
+    [⚙️ Configuración]({% url 'configuracion' %})
     {% endif %}
 📅 Agenda
     ➕ Nueva cita

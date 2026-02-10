@@ -101,9 +101,13 @@
 
 <!-- Script para manejar las tareas -->
 <script>
+    // URLs base (construidas en el servidor Django)
+    const URL_TAREAS_LISTAR = '{% url "agenda_tareas_listar" %}';
+    const URL_TAREAS_GUARDAR = '{% url "agenda_tareas_guardar" %}';
+    
     // Cargar tareas
     function cargarTareas() {
-        fetch('{% url "agenda_tareas_listar" %}')
+        fetch(URL_TAREAS_LISTAR)
             .then(response => response.json())
             .then(data => {
                 let tareasPendientes = data.tareas.filter(t => !t.completada);
@@ -122,14 +126,12 @@
                                         Creada: ${new Date(tarea.fecha_creacion).toLocaleString()}
                                     </small>
                                     <div>
-                                        <button class="btn-completar" data-id="${tarea.id}" 
-                                                style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;"
-                                                onclick="completarTarea('${tarea.id}')">
+                                        <button onclick="completarTarea(${tarea.id})" 
+                                                style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">
                                             ✓ Completar
                                         </button>
-                                        <button class="btn-eliminar" data-id="${tarea.id}" 
-                                                style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;"
-                                                onclick="eliminarTarea('${tarea.id}')">
+                                        <button onclick="eliminarTarea(${tarea.id})" 
+                                                style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
                                             🗑️ Eliminar
                                         </button>
                                     </div>
@@ -155,7 +157,7 @@
         const cliente_club = document.getElementById('cliente_club').value;
         const descripcion = document.getElementById('descripcion').value;
         
-        fetch('{% url "agenda_tareas_guardar" %}', {
+        fetch(URL_TAREAS_GUARDAR, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -182,7 +184,9 @@
     function completarTarea(tareaId) {
         if (!confirm('¿Marcar esta tarea como completada?')) return;
         
-        fetch('{% url "agenda_tareas_completar" 0 %}'.replace('0', tareaId), {
+        const url = `/pedidos/agenda/tareas/completar/${tareaId}/`;
+        
+        fetch(url, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -206,7 +210,9 @@
     function eliminarTarea(tareaId) {
         if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
         
-        fetch('{% url "agenda_tareas_eliminar" 0 %}'.replace('0', tareaId), {
+        const url = `/pedidos/agenda/tareas/eliminar/${tareaId}/`;
+        
+        fetch(url, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value

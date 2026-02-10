@@ -2,8 +2,8 @@
 {% block contenido %}
 
 <!-- Barra de navegación -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <div>
+<nav class="navbar-nav-horizontal mb-4">
+
          {% if request.resolver_match.url_name != 'pedidos_home' %}
     <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
     {% endif %}
@@ -24,9 +24,11 @@
     {% if request.resolver_match.url_name != 'configuracion' %}
     <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
     {% endif %}
+</nav>
+   
 
-    </div>
-</div>
+
+
 
 <!-- ========== SECCIÓN DE TAREAS ========== -->
 <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">

@@ -4,25 +4,27 @@
 <!-- Barra de navegación -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <div>
-        {% if request.resolver_match.url_name != 'pedidos_home' %}
-        <a href="{% url 'pedidos_home' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">🏠 Inicio</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'posibles_clientes' %}
-        <a href="{% url 'posibles_clientes' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">👥 Posibles clientes</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'gastos' %}
-        <a href="{% url 'gastos' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">💰 Gastos</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'resumen' %}
-        <a href="{% url 'resumen' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">📊 Resumen</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'configuracion' %}
-        <a href="{% url 'configuracion' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">⚙️ Configuración</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'agenda' %}
-        <a href="{% url 'agenda' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #007bff; text-decoration: none; border-radius: 4px;">📅 Agenda</a>
-        {% endif %}
-        <span style="display: inline-block; padding: 8px 16px; background-color: #28a745; color: white; border-radius: 4px;">✅ Tareas</span>
+         {% if request.resolver_match.url_name != 'pedidos_home' %}
+    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
+    {% endif %}
+
+    {% if request.resolver_match.url_name != 'tareas' %}
+    <a href="{% url 'agenda' %}" class="nav-item {% if request.resolver_match.url_name == 'tareasagenda' %}active{% endif %}">📅 Agenda</a>
+    {% endif %}
+
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'gastos' %}
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'configuracion' %}
+    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
+    {% endif %}
+
     </div>
 </div>
 

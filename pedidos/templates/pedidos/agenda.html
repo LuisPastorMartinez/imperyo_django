@@ -6,6 +6,9 @@
     {% if request.resolver_match.url_name != 'pedidos_home' %}
     <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
     {% endif %}
+{% if request.resolver_match.url_name != 'tareas' %}
+<a href="{% url 'tareas' %}" style="display: inline-block; padding: 8px 16px; margin-right: 8px; background-color: #f0f0f0; color: #28a745; text-decoration: none; border-radius: 4px;">✅ Tareas</a>
+{% endif %}
     {% if request.resolver_match.url_name != 'posibles_clientes' %}
     <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
     {% endif %}

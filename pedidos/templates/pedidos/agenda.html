@@ -1,233 +1,137 @@
 {% extends "base.html" %}
 {% block contenido %}
 
+<!-- Menú de navegación -->
+<nav class="navbar-nav-horizontal mb-4">
     {% if request.resolver_match.url_name != 'pedidos_home' %}
-    [🏠 Inicio]({% url 'pedidos_home' %})
+    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'posibles_clientes' %}
-    [👥 Posibles clientes]({% url 'posibles_clientes' %})
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'gastos' %}
-    [💰 Gastos]({% url 'gastos' %})
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'resumen' %}
-    [📊 Resumen]({% url 'resumen' %})
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
     {% endif %}
     {% if request.resolver_match.url_name != 'configuracion' %}
-    [⚙️ Configuración]({% url 'configuracion' %})
+    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
     {% endif %}
-📅 Agenda
+</nav>
+
+<h2>📅 Agenda</h2>
+
+<!-- Botón Nueva cita con badge -->
+<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario').style.display='block'">
     ➕ Nueva cita
     {% if citas_hoy_count > 0 %}
-        {{ citas_hoy_count }} hoy
+        <span class="badge bg-danger ms-2">{{ citas_hoy_count }} hoy</span>
     {% endif %}
-📝 Nueva cita
+</button>
+
+<!-- Formulario -->
+<div id="formulario" class="card-custom mb-4" style="display:none;">
+    <h5 class="section-title mb-3">📝 Nueva cita</h5>
+    <form method="POST" action="{% url 'agenda_guardar' %}">
         {% csrf_token %}
         
-         Fecha * Hora * Cliente * Teléfono * Tipo * — Seleccionar — Nuevo cliente Cliente existente Seguimiento Reunión Club Notas 💾 Guardar Cancelar 
-{% if citas %}
-📋 Citas ({{ citas|length }})
-| Fecha
-|Hora
-|Cliente
-|Teléfono
-|Club
-|Tipo
-|Notas
-|Acciones
-|
-| ---|---|---|---|---|---|---|---|
-            {% for c in citas %}
-            
-| {{ c.Fecha|default:"—" }}
-|{{ c.Hora|default:"—" }}
-|{{ c.Cliente|default:"—" }}
-|{{ c.Telefono|default:"—" }}
-|{{ c.Club|default:"—" }}
-|{{ c.Tipo|default:"—" }}
-|{{ c.Notas|default:"—" }}
-|  [🗑️]({% url 'agenda_eliminar' c.ID %})  
-|
-| ---|---|---|---|---|---|---|---|
-            {% endfor %}
+        <input type="hidden" name="cita_id" value="">
         
-{% else %}
-📭 No hay citas programadas
-{% endif %}
-
-<!-- ========== SECCIÓN DE TAREAS ========== -->
-<div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
-    <h2 style="margin-top: 0; color: #28a745;">✅ Lista de Tareas</h2>
-
-    <!-- Formulario Nueva Tarea -->
-    <div style="background-color: white; padding: 20px; margin-bottom: 20px; border-radius: 4px;">
-        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">➕ Nueva Tarea</h3>
-        <form id="formTarea" style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px; align-items: center;">
-            {% csrf_token %}
-            
-            <div>
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">👤 Cliente / Club *</label>
-                <input type="text" id="cliente_club" name="cliente_club" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Fecha *</label>
+                <input type="date" name="Fecha" class="form-control" required>
             </div>
-            
-            <div>
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">📝 Descripción *</label>
-                <textarea id="descripcion" name="descripcion" rows="2" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            <div class="col-md-6">
+                <label>Hora *</label>
+                <input type="time" name="Hora" class="form-control" required>
             </div>
-            
-            <div style="grid-column: span 2; display: flex; justify-content: flex-end;">
-                <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">📥 Añadir Tarea</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Lista de Tareas Pendientes -->
-    <div style="background-color: white; padding: 20px; border-radius: 4px;">
-        <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">📋 Tareas Pendientes (<span id="tareasPendientesCount">0</span>)</h3>
-        
-        <div id="tareasPendientes">
-            <p style="color: #6c757d; text-align: center;">📭 Cargando tareas...</p>
         </div>
-    </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Cliente *</label>
+                <input type="text" name="Cliente" class="form-control" placeholder="Nombre del cliente" required>
+            </div>
+            <div class="col-md-6">
+                <label>Teléfono *</label>
+                <input type="tel" name="Telefono" class="form-control" placeholder="Teléfono" required>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Tipo *</label>
+                <select name="Tipo" class="form-control" required>
+                    <option value="">— Seleccionar —</option>
+                    <option value="Nuevo cliente">Nuevo cliente</option>
+                    <option value="Cliente existente">Cliente existente</option>
+                    <option value="Seguimiento">Seguimiento</option>
+                    <option value="Reunión">Reunión</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label>Club</label>
+                <input type="text" name="Club" class="form-control" placeholder="Nombre del club">
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label>Notas</label>
+            <textarea name="Notas" class="form-control" rows="3" placeholder="Detalles de la cita"></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('formulario').style.display='none'">Cancelar</button>
+        </div>
+    </form>
 </div>
 
-[⬅️ Volver a Inicio]({% url 'pedidos_home' %})
+<!-- Tabla de citas -->
+{% if citas %}
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
+    <table class="table-home table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Club</th>
+                <th>Tipo</th>
+                <th>Notas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in citas %}
+            <tr>
+                <td>{{ c.Fecha|default:"—" }}</td>
+                <td>{{ c.Hora|default:"—" }}</td>
+                <td>{{ c.Cliente|default:"—" }}</td>
+                <td>{{ c.Telefono|default:"—" }}</td>
+                <td>{{ c.Club|default:"—" }}</td>
+                <td>{{ c.Tipo|default:"—" }}</td>
+                <td>{{ c.Notas|default:"—" }}</td>
+                <td>
+                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card-custom">
+    <p>📭 No hay citas programadas</p>
+</div>
+{% endif %}
 
-<!-- Script para manejar las tareas -->
-<script>
-    // URLs base
-    const URL_TAREAS_LISTAR = '{% url "agenda_tareas_listar" %}';
-    const URL_TAREAS_GUARDAR = '{% url "agenda_tareas_guardar" %}';
-    
-    // Cargar tareas
-    function cargarTareas() {
-        fetch(URL_TAREAS_LISTAR)
-            .then(response => response.json())
-            .then(data => {
-                let tareasPendientes = data.tareas.filter(t => !t.completada);
-                let tareasHtml = '';
-                
-                if (tareasPendientes.length === 0) {
-                    tareasHtml = '<div style="padding: 20px; text-align: center; color: #6c757d; background-color: #f8f9fa; border-radius: 4px;">📭 No hay tareas pendientes</div>';
-                } else {
-                    tareasPendientes.forEach(tarea => {
-                        tareasHtml += `
-                            <div style="background-color: #f8f9fa; padding: 15px; margin-bottom: 10px; border-radius: 4px; border-left: 4px solid #007bff;">
-                                <h4 style="margin: 0 0 8px 0; color: #333;">${tarea.cliente_club}</h4>
-                                <p style="margin: 0 0 10px 0; color: #495057;">${tarea.descripcion}</p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <small style="color: #6c757d;">
-                                        Creada: ${new Date(tarea.fecha_creacion).toLocaleString()}
-                                    </small>
-                                    <div>
-                                        <button onclick="completarTarea('${tarea.id}')" 
-                                                style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;">
-                                            ✓ Completar
-                                        </button>
-                                        <button onclick="eliminarTarea('${tarea.id}')" 
-                                                style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                                            🗑️ Eliminar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                document.getElementById('tareasPendientes').innerHTML = tareasHtml;
-                document.getElementById('tareasPendientesCount').textContent = tareasPendientes.length;
-            })
-            .catch(error => {
-                console.error('Error al cargar tareas:', error);
-                document.getElementById('tareasPendientes').innerHTML = '<div style="padding: 20px; text-align: center; color: #dc3545; background-color: #f8f9fa; border-radius: 4px;">❌ Error al cargar las tareas</div>';
-            });
-    }
-    
-    // Enviar nueva tarea
-    document.getElementById('formTarea').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const cliente_club = document.getElementById('cliente_club').value;
-        const descripcion = document.getElementById('descripcion').value;
-        
-        fetch(URL_TAREAS_GUARDAR, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: `cliente_club=${encodeURIComponent(cliente_club)}&descripcion=${encodeURIComponent(descripcion)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('formTarea').reset();
-                cargarTareas();
-            } else {
-                alert('Error: ' + (data.error || data.message));
-            }
-        })
-        .catch(error => {
-            console.error('Error al crear tarea:', error);
-            alert('Error al crear la tarea');
-        });
-    });
-    
-    // Completar tarea
-    function completarTarea(tareaId) {
-        if (!confirm('¿Marcar esta tarea como completada?')) return;
-        
-        const url = `/pedidos/agenda/tareas/completar/${tareaId}/`;
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                cargarTareas();
-            } else {
-                alert('Error: ' + (data.error || data.message));
-            }
-        })
-        .catch(error => {
-            console.error('Error al completar tarea:', error);
-            alert('Error al completar la tarea');
-        });
-    }
-    
-    // Eliminar tarea
-    function eliminarTarea(tareaId) {
-        if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
-        
-        const url = `/pedidos/agenda/tareas/eliminar/${tareaId}/`;
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                cargarTareas();
-            } else {
-                alert('Error: ' + (data.error || data.message));
-            }
-        })
-        .catch(error => {
-            console.error('Error al eliminar tarea:', error);
-            alert('Error al eliminar la tarea');
-        });
-    }
-    
-    // Cargar tareas al cargar la página
-    document.addEventListener('DOMContentLoaded', cargarTareas);
-</script>
+<div class="d-flex gap-2 mt-4">
+    <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+</div>
 
 {% endblock %}

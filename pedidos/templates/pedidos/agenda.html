@@ -1,328 +1,137 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-<!-- Barra de navegación -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        {% if request.resolver_match.url_name != 'pedidos_home' %}
-        <a href="{% url 'pedidos_home' %}" class="btn btn-outline-primary me-2">🏠 Inicio</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'posibles_clientes' %}
-        <a href="{% url 'posibles_clientes' %}" class="btn btn-outline-primary me-2">👥 Posibles clientes</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'gastos' %}
-        <a href="{% url 'gastos' %}" class="btn btn-outline-primary me-2">💰 Gastos</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'resumen' %}
-        <a href="{% url 'resumen' %}" class="btn btn-outline-primary me-2">📊 Resumen</a>
-        {% endif %}
-        {% if request.resolver_match.url_name != 'configuracion' %}
-        <a href="{% url 'configuracion' %}" class="btn btn-outline-primary me-2">⚙️ Configuración</a>
-        {% endif %}
-        <a href="{% url 'agenda' %}" class="btn btn-primary">📅 Agenda</a>
-    </div>
-</div>
+<!-- Menú de navegación -->
+<nav class="navbar-nav-horizontal mb-4">
+    {% if request.resolver_match.url_name != 'pedidos_home' %}
+    <a href="{% url 'pedidos_home' %}" class="nav-item {% if request.resolver_match.url_name == 'pedidos_home' %}active{% endif %}">🏠 Inicio</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'posibles_clientes' %}
+    <a href="{% url 'posibles_clientes' %}" class="nav-item {% if request.resolver_match.url_name == 'posibles_clientes' %}active{% endif %}">👥 Posibles clientes</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'gastos' %}
+    <a href="{% url 'gastos' %}" class="nav-item {% if request.resolver_match.url_name == 'gastos' %}active{% endif %}">💰 Gastos</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'resumen' %}
+    <a href="{% url 'resumen' %}" class="nav-item {% if request.resolver_match.url_name == 'resumen' %}active{% endif %}">📊 Resumen</a>
+    {% endif %}
+    {% if request.resolver_match.url_name != 'configuracion' %}
+    <a href="{% url 'configuracion' %}" class="nav-item {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}">⚙️ Configuración</a>
+    {% endif %}
+</nav>
 
-<!-- Sección de Citas -->
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-        <h2 class="mb-0">📅 Agenda</h2>
-        {% if citas_hoy_count > 0 %}
-            <span class="badge bg-warning text-dark ms-2"> {{ citas_hoy_count }} hoy</span>
-        {% endif %}
-    </div>
-    <div class="card-body">
-        <!-- Formulario de Nueva Cita -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h3 class="mb-0">📝 Nueva cita</h3>
+<h2>📅 Agenda</h2>
+
+<!-- Botón Nueva cita con badge -->
+<button type="button" class="btn btn-primary mb-4" onclick="document.getElementById('formulario').style.display='block'">
+    ➕ Nueva cita
+    {% if citas_hoy_count > 0 %}
+        <span class="badge bg-danger ms-2">{{ citas_hoy_count }} hoy</span>
+    {% endif %}
+</button>
+
+<!-- Formulario -->
+<div id="formulario" class="card-custom mb-4" style="display:none;">
+    <h5 class="section-title mb-3">📝 Nueva cita</h5>
+    <form method="POST" action="{% url 'agenda_guardar' %}">
+        {% csrf_token %}
+        
+        <input type="hidden" name="cita_id" value="">
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Fecha *</label>
+                <input type="date" name="Fecha" class="form-control" required>
             </div>
-            <div class="card-body">
-                <form method="POST" action="{% url 'agenda_guardar' %}">
-                    {% csrf_token %}
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <label for="Fecha" class="form-label">Fecha *</label>
-                            <input type="date" class="form-control" id="Fecha" name="Fecha" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="Hora" class="form-label">Hora *</label>
-                            <input type="time" class="form-control" id="Hora" name="Hora" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="Cliente" class="form-label">Cliente *</label>
-                            <input type="text" class="form-control" id="Cliente" name="Cliente" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="Telefono" class="form-label">Teléfono *</label>
-                            <input type="text" class="form-control" id="Telefono" name="Telefono" required>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="Tipo" class="form-label">Tipo *</label>
-                            <select class="form-select" id="Tipo" name="Tipo" required>
-                                <option value="">— Seleccionar —</option>
-                                <option value="Nuevo cliente">Nuevo cliente</option>
-                                <option value="Cliente existente">Cliente existente</option>
-                                <option value="Seguimiento">Seguimiento</option>
-                                <option value="Reunión">Reunión</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="Club" class="form-label">Club</label>
-                            <input type="text" class="form-control" id="Club" name="Club">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="Notas" class="form-label">Notas</label>
-                            <textarea class="form-control" id="Notas" name="Notas" rows="2"></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-success me-2">💾 Guardar</button>
-                        <a href="{% url 'agenda' %}" class="btn btn-secondary">Cancelar</a>
-                    </div>
-                </form>
+            <div class="col-md-6">
+                <label>Hora *</label>
+                <input type="time" name="Hora" class="form-control" required>
             </div>
         </div>
         
-        <!-- Lista de Citas -->
-        <div class="card">
-            <div class="card-header bg-light">
-                <h3 class="mb-0">📋 Citas ({{ citas|length }})</h3>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Cliente *</label>
+                <input type="text" name="Cliente" class="form-control" placeholder="Nombre del cliente" required>
             </div>
-            <div class="card-body">
-                {% if citas %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Cliente</th>
-                                <th>Teléfono</th>
-                                <th>Club</th>
-                                <th>Tipo</th>
-                                <th>Notas</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for c in citas %}
-                            <tr>
-                                <td>{{ c.Fecha|default:"—" }}</td>
-                                <td>{{ c.Hora|default:"—" }}</td>
-                                <td>{{ c.Cliente|default:"—" }}</td>
-                                <td>{{ c.Telefono|default:"—" }}</td>
-                                <td>{{ c.Club|default:"—" }}</td>
-                                <td>{{ c.Tipo|default:"—" }}</td>
-                                <td>{{ c.Notas|default:"—" }}</td>
-                                <td>
-                                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta cita?')">
-                                        🗑️ Eliminar
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="alert alert-info">
-                    📭 No hay citas programadas
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Sección de Tareas -->
-<div class="card">
-    <div class="card-header bg-success text-white">
-        <h2 class="mb-0">✅ Lista de Tareas</h2>
-    </div>
-    <div class="card-body">
-        <!-- Formulario de Nueva Tarea -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h3 class="mb-0">➕ Nueva Tarea</h3>
-            </div>
-            <div class="card-body">
-                <form id="formTarea">
-                    {% csrf_token %}
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="cliente_club" class="form-label">👤 Cliente / Club *</label>
-                            <input type="text" class="form-control" id="cliente_club" name="cliente_club" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="descripcion" class="form-label">📝 Descripción de la tarea *</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="2" required></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">📥 Añadir Tarea</button>
-                    </div>
-                </form>
+            <div class="col-md-6">
+                <label>Teléfono *</label>
+                <input type="tel" name="Telefono" class="form-control" placeholder="Teléfono" required>
             </div>
         </div>
         
-        <!-- Lista de Tareas Pendientes -->
-        <div class="card">
-            <div class="card-header bg-light">
-                <h3 class="mb-0">📋 Tareas Pendientes (<span id="tareasPendientesCount">0</span>)</h3>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Tipo *</label>
+                <select name="Tipo" class="form-control" required>
+                    <option value="">— Seleccionar —</option>
+                    <option value="Nuevo cliente">Nuevo cliente</option>
+                    <option value="Cliente existente">Cliente existente</option>
+                    <option value="Seguimiento">Seguimiento</option>
+                    <option value="Reunión">Reunión</option>
+                </select>
             </div>
-            <div class="card-body">
-                <div id="tareasPendientes">
-                    <p class="text-muted">📭 Cargando tareas...</p>
-                </div>
+            <div class="col-md-6">
+                <label>Club</label>
+                <input type="text" name="Club" class="form-control" placeholder="Nombre del club">
             </div>
         </div>
-    </div>
+        
+        <div class="mb-3">
+            <label>Notas</label>
+            <textarea name="Notas" class="form-control" rows="3" placeholder="Detalles de la cita"></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('formulario').style.display='none'">Cancelar</button>
+        </div>
+    </form>
 </div>
 
-<!-- Botón de Volver -->
-<div class="mt-4 text-center">
-    <a href="{% url 'pedidos_home' %}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i> Volver a Inicio
-    </a>
+<!-- Tabla de citas -->
+{% if citas %}
+<div class="card-custom mb-4">
+    <h5 class="section-title mb-3">📋 Citas ({{ citas|length }})</h5>
+    <table class="table-home table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Club</th>
+                <th>Tipo</th>
+                <th>Notas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in citas %}
+            <tr>
+                <td>{{ c.Fecha|default:"—" }}</td>
+                <td>{{ c.Hora|default:"—" }}</td>
+                <td>{{ c.Cliente|default:"—" }}</td>
+                <td>{{ c.Telefono|default:"—" }}</td>
+                <td>{{ c.Club|default:"—" }}</td>
+                <td>{{ c.Tipo|default:"—" }}</td>
+                <td>{{ c.Notas|default:"—" }}</td>
+                <td>
+                    <a href="{% url 'agenda_eliminar' c.ID %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
+{% else %}
+<div class="card-custom">
+    <p>📭 No hay citas programadas</p>
+</div>
+{% endif %}
 
-<!-- Script para manejar las tareas -->
-<script>
-    // Cargar tareas
-    function cargarTareas() {
-        fetch('{% url "agenda_tareas_listar" %}')
-            .then(response => response.json())
-            .then(data => {
-                let tareasPendientes = data.tareas.filter(t => !t.completada);
-                let tareasHtml = '';
-                
-                if (tareasPendientes.length === 0) {
-                    tareasHtml = '<div class="alert alert-info">📭 No hay tareas pendientes</div>';
-                } else {
-                    tareasPendientes.forEach(tarea => {
-                        tareasHtml += `
-                            <div class="card mb-2">
-                                <div class="card-body">
-                                    <h5 class="card-title">${tarea.cliente_club}</h5>
-                                    <p class="card-text">${tarea.descripcion}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">Creada: ${new Date(tarea.fecha_creacion).toLocaleString()}</small>
-                                        <div>
-                                            <button class="btn btn-success btn-sm completar-tarea" data-id="${tarea.id}">✓ Completar</button>
-                                            <button class="btn btn-danger btn-sm eliminar-tarea" data-id="${tarea.id}">🗑️ Eliminar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-                
-                document.getElementById('tareasPendientes').innerHTML = tareasHtml;
-                document.getElementById('tareasPendientesCount').textContent = tareasPendientes.length;
-            })
-            .catch(error => {
-                console.error('Error al cargar tareas:', error);
-                document.getElementById('tareasPendientes').innerHTML = '<div class="alert alert-danger">❌ Error al cargar las tareas</div>';
-            });
-    }
-    
-    // Enviar nueva tarea
-    document.getElementById('formTarea').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const cliente_club = document.getElementById('cliente_club').value;
-        const descripcion = document.getElementById('descripcion').value;
-        
-        fetch('{% url "agenda_tareas_guardar" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: `cliente_club=${encodeURIComponent(cliente_club)}&descripcion=${encodeURIComponent(descripcion)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('formTarea').reset();
-                cargarTareas();
-            } else {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error al crear tarea:', error);
-            alert('Error al crear la tarea');
-        });
-    });
-    
-    // Completar tarea
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('completar-tarea')) {
-            const tareaId = e.target.getAttribute('data-id');
-            
-            if (!confirm('¿Marcar esta tarea como completada?')) return;
-            
-            fetch('{% url "agenda_tareas_completar" tareaId %}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    cargarTareas();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error al completar tarea:', error);
-                alert('Error al completar la tarea');
-            });
-        }
-    });
-    
-    // Eliminar tarea
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('eliminar-tarea')) {
-            const tareaId = e.target.getAttribute('data-id');
-            
-            if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
-            
-            fetch('{% url "agenda_tareas_eliminar" tareaId %}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    cargarTareas();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error al eliminar tarea:', error);
-                alert('Error al eliminar la tarea');
-            });
-        }
-    });
-    
-    // Cargar tareas al cargar la página
-    document.addEventListener('DOMContentLoaded', cargarTareas);
-</script>
+<div class="d-flex gap-2 mt-4">
+    <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+</div>
 
 {% endblock %}

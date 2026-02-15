@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from firebase_admin import firestore
+#from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from utils.firestore_utils import get_firestore_client
 from datetime import date, datetime

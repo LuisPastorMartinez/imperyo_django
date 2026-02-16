@@ -70,7 +70,6 @@
 <!-- JavaScript para manejar tareas -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Cargar tareas al iniciar
     cargarTareas();
 
     // Manejar envío del formulario
@@ -141,7 +140,7 @@ function cargarTareas() {
                 completadasDiv.innerHTML = completadas.map(tarea => crearTarjetaTarea(tarea, true)).join('');
             }
 
-            // Agregar event listeners a los botones
+            // Agregar event listeners a los botones (después de renderizar)
             document.querySelectorAll('.btn-completar').forEach(btn => {
                 btn.addEventListener('click', function() {
                     completarTarea(this.dataset.tareaId);
@@ -183,17 +182,23 @@ function crearTarjetaTarea(tarea, esCompletada) {
     `;
 }
 
-// Completar tarea
+// Completar tarea - URL CORREGIDA
 function completarTarea(tareaId) {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
     fetch(`/tareas/completar/${tareaId}/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': csrfToken
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             cargarTareas();
@@ -202,12 +207,12 @@ function completarTarea(tareaId) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('❌ Error de conexión');
+        console.error('Error al completar:', error);
+        alert('❌ Error de conexión al completar tarea');
     });
 }
 
-// Eliminar tarea
+// Eliminar tarea - URL CORREGIDA
 function eliminarTarea(tareaId) {
     if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
     
@@ -216,10 +221,16 @@ function eliminarTarea(tareaId) {
     fetch(`/tareas/eliminar/${tareaId}/`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': csrfToken
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             cargarTareas();
@@ -228,8 +239,8 @@ function eliminarTarea(tareaId) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('❌ Error de conexión');
+        console.error('Error al eliminar:', error);
+        alert('❌ Error de conexión al eliminar tarea');
     });
 }
 </script>

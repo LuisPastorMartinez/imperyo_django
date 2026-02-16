@@ -291,6 +291,35 @@ def pedido_editar(request, pedido_id):
             fecha_finalizacion = date.today().isoformat()
         # Si ya existe, no se modifica
 
+        # 📢 NOTIFICACIÓN TELEGRAM - TRABAJO TERMINADO
+        try:
+            from utils.notifications import enviar_telegram
+            import os
+            
+            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+            chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+            
+            if bot_token and chat_id:
+                # Verificar si "trabajo terminado" se agregó en esta edición
+                estados_anteriores = set(pedido.get("Estados", []))
+                
+                if "trabajo terminado" in estados_set and "trabajo terminado" not in estados_anteriores:
+                    mensaje = f"""
+✅ <b>PEDIDO TERMINADO</b>
+
+📋 <b>ID:</b> {pedido_id}
+👤 <b>Cliente:</b> {request.POST.get('Cliente', 'N/A')}
+🏢 <b>Club:</b> {request.POST.get('Club', 'N/A')}
+📱 <b>Teléfono:</b> {request.POST.get('Telefono', 'N/A')}
+💰 <b>Total:</b> {total_pedido}€
+📅 <b>Finalizado:</b> {date.today().isoformat()}
+
+#Terminado #{pedido_id}
+"""
+                    enviar_telegram(mensaje, bot_token, chat_id)
+        except Exception as e:
+            print(f"Error enviando Telegram trabajo terminado: {e}")
+
         ref.update({
             "Cliente": request.POST.get("Cliente", "").strip(),
             "Telefono": request.POST.get("Telefono", "").strip(),
@@ -321,7 +350,6 @@ def pedido_editar(request, pedido_id):
         "productos_disponibles": sorted(productos_disponibles),
         "tejidos_disponibles": sorted(tejidos_disponibles),
     })
-
 
 # ======================================================
 # DETALLE

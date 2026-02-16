@@ -48,7 +48,6 @@ def pedidos_home(request):
     pedidos = sorted(pedidos, key=lambda x: int(x["ID"]), reverse=True)
 
     return render(request, "pedidos/home.html", {"pedidos": pedidos})
-
 # ======================================================
 # CREAR
 # ======================================================
@@ -155,6 +154,32 @@ def pedido_crear(request):
             "total_pedido": total_pedido,
         })
 
+        # 📢 NOTIFICACIÓN TELEGRAM - NUEVO PEDIDO
+        try:
+            from utils.notifications import enviar_telegram
+            import os
+            
+            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+            chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+            
+            if bot_token and chat_id:
+                mensaje = f"""
+🔔 <b>NUEVO PEDIDO CREADO</b>
+
+📋 <b>ID:</b> {nuevo_id}
+👤 <b>Cliente:</b> {request.POST.get('Cliente', 'N/A')}
+🏢 <b>Club:</b> {request.POST.get('Club', 'N/A')}
+📱 <b>Teléfono:</b> {request.POST.get('Telefono', 'N/A')}
+📦 <b>Productos:</b> {len(productos)}
+💰 <b>Total:</b> {total_pedido}€
+📅 <b>Entrega:</b> {request.POST.get('Fecha_entrega_estimada', 'N/A')}
+
+#Pedido #{nuevo_id}
+"""
+                enviar_telegram(mensaje, bot_token, chat_id)
+        except Exception as e:
+            print(f"Error enviando Telegram nuevo pedido: {e}")
+
         return redirect("/pedidos/")
 
     estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado",                              "retirado", "trabajo terminado"]
@@ -166,7 +191,6 @@ def pedido_crear(request):
         "tejidos_disponibles": sorted(tejidos_disponibles),
         "fecha_hoy": date.today().isoformat(),
     })
-
 
 # ======================================================
 # EDITAR

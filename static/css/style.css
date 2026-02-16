@@ -314,3 +314,267 @@ input.input-fecha-calendario::-webkit-calendar-picker-indicator {
         padding: 12px 0;
     }
 }
+/* Agrega esto al final de tu style.css */
+
+/* === OPTIMIZACIÓN MÓVIL === */
+.container-mobile {
+    padding: 0 12px;
+    max-width: 100%;
+}
+
+/* Menú horizontal scrollable en móvil */
+.navbar-nav-horizontal-mobile {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: 12px;
+}
+
+.navbar-nav-horizontal-mobile::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-item-mobile {
+    padding: 8px 16px;
+    text-decoration: none;
+    color: var(--text-color);
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.nav-item-mobile:hover,
+.nav-item-mobile.active {
+    background: var(--btn-theme-bg);
+    color: var(--btn-theme-text);
+}
+
+/* Títulos móviles */
+.mobile-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.mobile-card-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+/* Formularios móviles */
+.form-group-mobile {
+    margin-bottom: 12px;
+}
+
+.form-label-mobile {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-control-mobile {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-control-mobile:focus {
+    border-color: #00a6ff;
+    outline: none;
+}
+
+/* Botones móviles - tamaño táctil mínimo 44px */
+.btn-primary-mobile,
+.btn-secondary-mobile {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    min-height: 44px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary-mobile {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary-mobile {
+    background: var(--bg-secondary);
+    color: var(--text-color);
+}
+
+/* Tarjetas de tareas optimizadas para móvil */
+.tarea-card {
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.tarea-card.tarea-completada {
+    opacity: 0.7;
+    background: var(--bg-secondary);
+}
+
+.tarea-card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.tarea-info {
+    flex: 1;
+}
+
+.tarea-info strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.tarea-desc {
+    margin: 0 0 6px 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.tarea-date {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.tarea-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-action {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.btn-completar {
+    background: #28a745;
+    color: white;
+}
+
+.btn-eliminar {
+    background: #dc3545;
+    color: white;
+}
+
+/* === MEDIA QUERIES PARA MÓVIL === */
+@media (max-width: 768px) {
+    .container-mobile {
+        padding: 0 10px;
+    }
+    
+    .card-custom {
+        padding: 15px;
+    }
+    
+    .mobile-title {
+        font-size: 1.3rem;
+    }
+    
+    /* Tablas con scroll horizontal */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        min-width: 700px;
+    }
+    
+    /* Botones full-width en móvil */
+    .btn-mobile-full {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    /* Navbar más compacta */
+    .navbar {
+        padding: 0.5rem;
+    }
+    
+    .navbar-title-container {
+        font-size: 1.5rem;
+    }
+    
+    .logo-container {
+        width: 80px;
+        height: 70px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-mobile {
+        padding: 0 8px;
+    }
+    
+    .nav-item-mobile {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .tarea-card-body {
+        flex-direction: column;
+    }
+    
+    .tarea-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+    
+    .mobile-title {
+        font-size: 1.2rem;
+    }
+}
+
+/* === ACCESIBILIDAD TÁCTIL === */
+@media (hover: none) and (pointer: coarse) {
+    .nav-item-mobile,
+    .btn-action,
+    .btn-primary-mobile,
+    .btn-secondary-mobile {
+        min-height: 48px;
+        min-width: 48px;
+    }
+    
+    .form-control-mobile {
+        padding: 14px;
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+}

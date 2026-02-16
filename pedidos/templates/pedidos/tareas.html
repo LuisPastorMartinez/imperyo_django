@@ -1,69 +1,67 @@
 {% extends "base.html" %}
 {% block contenido %}
 
-<div class="container mt-4">
-    <!-- Navegación -->
-    <div class="navbar-nav-horizontal">
+<div class="container-mobile mt-3">
+    <!-- Navegación Mobile-Friendly -->
+    <div class="navbar-nav-horizontal-mobile">
         {% if request.resolver_match.url_name != 'pedidos_home' %}
-        <a class="nav-item" href="{% url 'pedidos_home' %}">🏠 Inicio</a>
+        <a class="nav-item-mobile" href="{% url 'pedidos_home' %}">🏠 Inicio</a>
         {% endif %}
         {% if request.resolver_match.url_name != 'agenda' %}
-        <a class="nav-item" href="{% url 'agenda' %}">📅 Agenda</a>
+        <a class="nav-item-mobile" href="{% url 'agenda' %}">📅 Agenda</a>
         {% endif %}
         {% if request.resolver_match.url_name != 'posibles_clientes' %}
-        <a class="nav-item" href="{% url 'posibles_clientes' %}">👥 Posibles clientes</a>
+        <a class="nav-item-mobile" href="{% url 'posibles_clientes' %}">👥 Clientes</a>
         {% endif %}
         {% if request.resolver_match.url_name != 'gastos' %}
-        <a class="nav-item" href="{% url 'gastos' %}">💰 Gastos</a>
+        <a class="nav-item-mobile" href="{% url 'gastos' %}">💰 Gastos</a>
         {% endif %}
         {% if request.resolver_match.url_name != 'resumen' %}
-        <a class="nav-item" href="{% url 'resumen' %}">📊 Resumen</a>
+        <a class="nav-item-mobile" href="{% url 'resumen' %}">📊 Resumen</a>
         {% endif %}
         {% if request.resolver_match.url_name != 'configuracion' %}
-        <a class="nav-item" href="{% url 'configuracion' %}">⚙️ Configuración</a>
+        <a class="nav-item-mobile" href="{% url 'configuracion' %}">⚙️ Ajustes</a>
         {% endif %}
     </div>
 
     <!-- Título -->
-    <h2 class="mb-4">✅ Lista de Tareas</h2>
+    <h2 class="mb-3 mobile-title">✅ Tareas</h2>
 
     <!-- Formulario Nueva Tarea -->
-    <div class="card-custom mb-4">
-        <h4>➕ Nueva Tarea</h4>
+    <div class="card-custom mb-3">
+        <h4 class="mobile-card-title">➕ Nueva Tarea</h4>
         <form id="form-tarea">
             {% csrf_token %}
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">👤 Cliente / Club *</label>
-                    <input type="text" class="form-control" id="cliente_club" name="cliente_club" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">📝 Descripción *</label>
-                    <input type="text" class="form-control" id="descripcion" name="descripcion" required>
-                </div>
+            <div class="form-group-mobile">
+                <label class="form-label-mobile">👤 Cliente / Club *</label>
+                <input type="text" class="form-control-mobile" id="cliente_club" name="cliente_club" required>
             </div>
-            <button type="submit" class="btn btn-primary">📥 Añadir Tarea</button>
+            <div class="form-group-mobile">
+                <label class="form-label-mobile">📝 Descripción *</label>
+                <input type="text" class="form-control-mobile" id="descripcion" name="descripcion" required>
+            </div>
+            <button type="submit" class="btn btn-primary-mobile w-100">📥 Añadir Tarea</button>
         </form>
     </div>
 
     <!-- Tareas Pendientes -->
-    <div class="card-custom mb-4">
-        <h4>📋 Tareas Pendientes (<span id="pendientes-count">0</span>)</h4>
+    <div class="card-custom mb-3">
+        <h4 class="mobile-card-title">📋 Pendientes (<span id="pendientes-count">0</span>)</h4>
         <div id="tareas-pendientes">
-            <p class="text-muted">📭 Cargando tareas...</p>
+            <p class="text-muted">📭 Cargando...</p>
         </div>
     </div>
 
     <!-- Tareas Completadas -->
     <div class="card-custom">
-        <h4>✅ Tareas Completadas (<span id="completadas-count">0</span>)</h4>
+        <h4 class="mobile-card-title">✅ Completadas (<span id="completadas-count">0</span>)</h4>
         <div id="tareas-completadas">
-            <p class="text-muted">📭 Cargando tareas...</p>
+            <p class="text-muted">📭 Cargando...</p>
         </div>
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'pedidos_home' %}" class="btn btn-secondary">⬅️ Volver a Inicio</a>
+        <a href="{% url 'pedidos_home' %}" class="btn btn-secondary-mobile w-100">⬅️ Volver a Inicio</a>
     </div>
 </div>
 
@@ -80,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         if (!clienteClub || !descripcion) {
-            alert('⚠️ Por favor completa todos los campos');
+            alert('⚠️ Completa todos los campos');
             return;
         }
 
@@ -98,9 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('cliente_club').value = '';
                 document.getElementById('descripcion').value = '';
                 cargarTareas();
-                alert('✅ Tarea creada correctamente');
+                alert('✅ Tarea creada');
             } else {
-                alert('❌ Error: ' + (data.error || 'No se pudo guardar la tarea'));
+                alert('❌ Error: ' + (data.error || 'No se pudo guardar'));
             }
         })
         .catch(error => {
@@ -123,14 +121,14 @@ function cargarTareas() {
 
             const pendientesDiv = document.getElementById('tareas-pendientes');
             if (pendientes.length === 0) {
-                pendientesDiv.innerHTML = '<p class="text-muted">📭 No hay tareas pendientes</p>';
+                pendientesDiv.innerHTML = '<p class="text-muted">📭 Sin tareas pendientes</p>';
             } else {
                 pendientesDiv.innerHTML = pendientes.map(tarea => crearTarjetaTarea(tarea, false)).join('');
             }
 
             const completadasDiv = document.getElementById('tareas-completadas');
             if (completadas.length === 0) {
-                completadasDiv.innerHTML = '<p class="text-muted">📭 No hay tareas completadas</p>';
+                completadasDiv.innerHTML = '<p class="text-muted">📭 Sin tareas completadas</p>';
             } else {
                 completadasDiv.innerHTML = completadas.map(tarea => crearTarjetaTarea(tarea, true)).join('');
             }
@@ -148,27 +146,26 @@ function cargarTareas() {
             });
         })
         .catch(error => {
-            console.error('Error al cargar tareas:', error);
-            document.getElementById('tareas-pendientes').innerHTML = '<p class="text-danger">❌ Error al cargar tareas</p>';
-            document.getElementById('tareas-completadas').innerHTML = '<p class="text-danger">❌ Error al cargar tareas</p>';
+            console.error('Error al cargar:', error);
+            document.getElementById('tareas-pendientes').innerHTML = '<p class="text-danger">❌ Error al cargar</p>';
+            document.getElementById('tareas-completadas').innerHTML = '<p class="text-danger">❌ Error al cargar</p>';
         });
 }
 
 function crearTarjetaTarea(tarea, esCompletada) {
     const fecha = tarea.fecha_creacion ? new Date(tarea.fecha_creacion).toLocaleDateString() : 'Sin fecha';
-    const usuario = tarea.usuario ? `👤 ${tarea.usuario}` : '';
     
     return `
-        <div class="border rounded p-3 mb-2 ${esCompletada ? 'bg-light' : ''}" style="opacity: ${esCompletada ? '0.7' : '1'}">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
+        <div class="tarea-card ${esCompletada ? 'tarea-completada' : ''}">
+            <div class="tarea-card-body">
+                <div class="tarea-info">
                     <strong>👤 ${tarea.cliente_club || 'Sin cliente'}</strong>
-                    <p class="mb-1">${tarea.descripcion || 'Sin descripción'}</p>
-                    <small class="text-muted">📅 ${fecha} ${usuario ? '• ' + usuario : ''}</small>
+                    <p class="tarea-desc">${tarea.descripcion || 'Sin descripción'}</p>
+                    <small class="tarea-date">📅 ${fecha}</small>
                 </div>
-                <div>
-                    ${!esCompletada ? `<button class="btn btn-sm btn-success btn-completar" data-tarea-id="${tarea.id}">✅</button>` : ''}
-                    <button class="btn btn-sm btn-danger btn-eliminar" data-tarea-id="${tarea.id}">🗑️</button>
+                <div class="tarea-actions">
+                    ${!esCompletada ? `<button class="btn-action btn-completar" data-tarea-id="${tarea.id}">✅</button>` : ''}
+                    <button class="btn-action btn-eliminar" data-tarea-id="${tarea.id}">🗑️</button>
                 </div>
             </div>
         </div>
@@ -178,7 +175,6 @@ function crearTarjetaTarea(tarea, esCompletada) {
 function completarTarea(tareaId) {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-    // ✅ URL CORREGIDA - Usa Django URL tag
     fetch("{% url 'tareas_completar' '0' %}".replace('0', tareaId), {
         method: 'POST',
         headers: {
@@ -191,21 +187,20 @@ function completarTarea(tareaId) {
         if (data.success) {
             cargarTareas();
         } else {
-            alert('❌ Error: ' + (data.error || 'No se pudo completar la tarea'));
+            alert('❌ Error: ' + (data.error || 'No se pudo completar'));
         }
     })
     .catch(error => {
-        console.error('Error al completar:', error);
-        alert('❌ Error de conexión al completar tarea');
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
     });
 }
 
 function eliminarTarea(tareaId) {
-    if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
+    if (!confirm('¿Eliminar esta tarea?')) return;
     
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-    // ✅ URL CORREGIDA - Usa Django URL tag
     fetch("{% url 'tareas_eliminar' '0' %}".replace('0', tareaId), {
         method: 'POST',
         headers: {
@@ -218,12 +213,12 @@ function eliminarTarea(tareaId) {
         if (data.success) {
             cargarTareas();
         } else {
-            alert('❌ Error: ' + (data.error || 'No se pudo eliminar la tarea'));
+            alert('❌ Error: ' + (data.error || 'No se pudo eliminar'));
         }
     })
     .catch(error => {
-        console.error('Error al eliminar:', error);
-        alert('❌ Error de conexión al eliminar tarea');
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
     });
 }
 </script>

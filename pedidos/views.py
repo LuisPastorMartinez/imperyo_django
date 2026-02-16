@@ -154,17 +154,16 @@ def pedido_crear(request):
             "total_pedido": total_pedido,
         })
 
-        # 📢 NOTIFICACIÓN TELEGRAM - NUEVO PEDIDO
-        try:
-            from utils.notifications import enviar_telegram
-            import os
-            
-            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
-            chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
-            
-            if bot_token and chat_id:
-                mensaje = f"""
-🔔 <b>NUEVO PEDIDO CREADO</b>
+            # 📢 NOTIFICACIÓN TELEGRAM - NUEVO PEDIDO
+    try:
+        from utils.notifications import enviar_telegram
+        import os
+        
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+        chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+        
+        if bot_token and chat_id:
+            mensaje = f"""🔔 <b>NUEVO PEDIDO CREADO</b>
 
 📋 <b>ID:</b> {nuevo_id}
 👤 <b>Cliente:</b> {request.POST.get('Cliente', 'N/A')}
@@ -174,11 +173,10 @@ def pedido_crear(request):
 💰 <b>Total:</b> {total_pedido}€
 📅 <b>Entrega:</b> {request.POST.get('Fecha_entrega_estimada', 'N/A')}
 
-#Pedido #{nuevo_id}
-"""
-                enviar_telegram(mensaje, bot_token, chat_id)
-        except Exception as e:
-            print(f"Error enviando Telegram nuevo pedido: {e}")
+#Pedido #{nuevo_id}"""
+            enviar_telegram(mensaje, bot_token, chat_id)
+    except Exception as e:
+        print(f"Error enviando Telegram nuevo pedido: {e}")
 
         return redirect("/pedidos/")
 
@@ -291,21 +289,20 @@ def pedido_editar(request, pedido_id):
             fecha_finalizacion = date.today().isoformat()
         # Si ya existe, no se modifica
 
-        # 📢 NOTIFICACIÓN TELEGRAM - TRABAJO TERMINADO
-        try:
-            from utils.notifications import enviar_telegram
-            import os
+            # 📢 NOTIFICACIÓN TELEGRAM - TRABAJO TERMINADO
+    try:
+        from utils.notifications import enviar_telegram
+        import os
+        
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+        chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+        
+        if bot_token and chat_id:
+            # Verificar si "trabajo terminado" se agregó en esta edición
+            estados_anteriores = set(pedido.get("Estados", []))
             
-            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
-            chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
-            
-            if bot_token and chat_id:
-                # Verificar si "trabajo terminado" se agregó en esta edición
-                estados_anteriores = set(pedido.get("Estados", []))
-                
-                if "trabajo terminado" in estados_set and "trabajo terminado" not in estados_anteriores:
-                    mensaje = f"""
-✅ <b>PEDIDO TERMINADO</b>
+            if "trabajo terminado" in estados_set and "trabajo terminado" not in estados_anteriores:
+                mensaje = f"""✅ <b>PEDIDO TERMINADO</b>
 
 📋 <b>ID:</b> {pedido_id}
 👤 <b>Cliente:</b> {request.POST.get('Cliente', 'N/A')}
@@ -314,11 +311,10 @@ def pedido_editar(request, pedido_id):
 💰 <b>Total:</b> {total_pedido}€
 📅 <b>Finalizado:</b> {date.today().isoformat()}
 
-#Terminado #{pedido_id}
-"""
-                    enviar_telegram(mensaje, bot_token, chat_id)
-        except Exception as e:
-            print(f"Error enviando Telegram trabajo terminado: {e}")
+#Terminado #{pedido_id}"""
+                enviar_telegram(mensaje, bot_token, chat_id)
+    except Exception as e:
+        print(f"Error enviando Telegram trabajo terminado: {e}")
 
         ref.update({
             "Cliente": request.POST.get("Cliente", "").strip(),

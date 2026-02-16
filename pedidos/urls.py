@@ -14,8 +14,7 @@ urlpatterns = [
     path("resumen/", views.resumen, name="resumen"),
     path("configuracion/", views.configuracion, name="configuracion"),
     
-    # Tareas (página independiente) 
-    path('tareas/', views.tareas, name='tareas'),
+    
 
     # Agenda (citas)
     path('agenda/', views.agenda, name='agenda'),

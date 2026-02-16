@@ -72,7 +72,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     cargarTareas();
 
-    // Manejar envío del formulario
     document.getElementById('form-tarea').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -111,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Función para cargar todas las tareas
 function cargarTareas() {
     fetch("{% url 'tareas_listar' %}")
         .then(response => response.json())
@@ -120,11 +118,9 @@ function cargarTareas() {
             const pendientes = tareas.filter(t => !t.completada);
             const completadas = tareas.filter(t => t.completada);
 
-            // Actualizar contadores
             document.getElementById('pendientes-count').textContent = pendientes.length;
             document.getElementById('completadas-count').textContent = completadas.length;
 
-            // Renderizar pendientes
             const pendientesDiv = document.getElementById('tareas-pendientes');
             if (pendientes.length === 0) {
                 pendientesDiv.innerHTML = '<p class="text-muted">📭 No hay tareas pendientes</p>';
@@ -132,7 +128,6 @@ function cargarTareas() {
                 pendientesDiv.innerHTML = pendientes.map(tarea => crearTarjetaTarea(tarea, false)).join('');
             }
 
-            // Renderizar completadas
             const completadasDiv = document.getElementById('tareas-completadas');
             if (completadas.length === 0) {
                 completadasDiv.innerHTML = '<p class="text-muted">📭 No hay tareas completadas</p>';
@@ -140,7 +135,6 @@ function cargarTareas() {
                 completadasDiv.innerHTML = completadas.map(tarea => crearTarjetaTarea(tarea, true)).join('');
             }
 
-            // Agregar event listeners a los botones (después de renderizar)
             document.querySelectorAll('.btn-completar').forEach(btn => {
                 btn.addEventListener('click', function() {
                     completarTarea(this.dataset.tareaId);
@@ -160,7 +154,6 @@ function cargarTareas() {
         });
 }
 
-// Crear HTML para una tarjeta de tarea
 function crearTarjetaTarea(tarea, esCompletada) {
     const fecha = tarea.fecha_creacion ? new Date(tarea.fecha_creacion).toLocaleDateString() : 'Sin fecha';
     const usuario = tarea.usuario ? `👤 ${tarea.usuario}` : '';
@@ -182,7 +175,6 @@ function crearTarjetaTarea(tarea, esCompletada) {
     `;
 }
 
-// Completar tarea - URL CORREGIDA
 function completarTarea(tareaId) {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
@@ -193,12 +185,7 @@ function completarTarea(tareaId) {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             cargarTareas();
@@ -212,7 +199,6 @@ function completarTarea(tareaId) {
     });
 }
 
-// Eliminar tarea - URL CORREGIDA
 function eliminarTarea(tareaId) {
     if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
     
@@ -225,12 +211,7 @@ function eliminarTarea(tareaId) {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             cargarTareas();

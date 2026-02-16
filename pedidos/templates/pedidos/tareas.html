@@ -178,7 +178,8 @@ function crearTarjetaTarea(tarea, esCompletada) {
 function completarTarea(tareaId) {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-    fetch(`/tareas/completar/${tareaId}/`, {
+    // ✅ URL CORREGIDA - Usa Django URL tag
+    fetch("{% url 'tareas_completar' '0' %}".replace('0', tareaId), {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken,
@@ -204,7 +205,8 @@ function eliminarTarea(tareaId) {
     
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
-    fetch(`/tareas/eliminar/${tareaId}/`, {
+    // ✅ URL CORREGIDA - Usa Django URL tag
+    fetch("{% url 'tareas_eliminar' '0' %}".replace('0', tareaId), {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken,

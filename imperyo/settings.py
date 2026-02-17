@@ -1,7 +1,10 @@
 from pathlib import Path
 import sys
 import os
+from dotenv import load_dotenv  # 👈 1. IMPORTAR
 
+# 👈 2. CARGAR VARIABLES DEL .ENV
+load_dotenv()
 # ===========================================================
 # BASE DEL PROYECTO
 # ===========================================================

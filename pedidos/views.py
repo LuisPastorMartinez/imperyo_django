@@ -158,7 +158,7 @@ def pedido_crear(request):
             from utils.notifications import enviar_telegram
             import os
             
-            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')  # ✅ CORREGIDO
             chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
             
             if bot_token and chat_id:
@@ -186,6 +186,8 @@ def pedido_crear(request):
         "tejidos_disponibles": sorted(tejidos_disponibles),
         "fecha_hoy": date.today().isoformat(),
     })
+
+
 # ======================================================
 # EDITAR
 # ======================================================

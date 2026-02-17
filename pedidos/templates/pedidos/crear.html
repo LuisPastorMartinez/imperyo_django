@@ -1,305 +1,201 @@
 {% extends "base.html" %}
 {% block contenido %}
-
-<div class="card-custom p-4">
-
-    <h2 class="mb-4">Crear pedido #{{ pedido_id }}</h2>
-
-    <form method="post" id="formPedido">
+<div class="container mt-4">
+    <h2>Crear pedido #{{ pedido_id }}</h2>
+    
+    <form method="POST" id="pedidoForm">
         {% csrf_token %}
-
-        <!-- DATOS DEL CLIENTE: Cliente, Teléfono, Club -->
-        <h5 class="section-title mb-3">Datos del cliente</h5>
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label>Cliente *</label>
-                <input type="text" name="Cliente" class="form-control" required>
-            </div>
-            <div class="col-md-4">
-                <label>Teléfono *</label>
-                <input type="text" name="Telefono" class="form-control" pattern="[0-9]{9}" maxlength="9" required>
-            </div>
-            <div class="col-md-4">
-                <label>Club</label>
-                <input type="text" name="Club" class="form-control">
-            </div>
-        </div>
-
-        <!-- FECHAS -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label>Fecha estimada de entrega</label>
-                <input type="date" name="Fecha_entrega_estimada" class="form-control input-fecha-calendario">
-            </div>
-            <div class="col-md-6">
-                <label>Fecha de entrada</label>
-                <input type="date" name="Fecha_entrada" class="form-control" value="{{ fecha_hoy }}" readonly>
-            </div>
-        </div>
-
-        <!-- COMENTARIOS -->
-        <div class="mb-4">
-            <label>Comentarios</label>
-            <textarea name="Comentarios" class="form-control" rows="3" placeholder="Notas sobre lo hablado con el cliente..."></textarea>
-        </div>
-
-<!-- ESTADOS -->
-<h5 class="section-title mb-2">Estados</h5>
-<div class="estados-box mb-4">
-    <label>
-        <input type="checkbox" name="Estados" value="Nuevo" class="estado-exclusivo"> Nuevo
-    </label>
-    <label>
-        <input type="checkbox" name="Estados" value="diseño" class="estado-exclusivo"> diseño
-    </label>
-    <label>
-        <input type="checkbox" name="Estados" value="fabricacion" class="estado-exclusivo"> fabricacion
-    </label>
-    <label>
-        <input type="checkbox" name="Estados" value="trabajo iniciado" class="estado-exclusivo"> trabajo iniciado
-    </label>
-    <label>
-        <input type="checkbox" name="Estados" value="cobrado"> cobrado
-    </label>
-</div>
         
-
-        <!-- PRODUCTOS -->
-        <h5 class="section-title mb-2">Productos</h5>
-
-        <table class="table table-bordered table-detail">
-            <colgroup>
-                <col style="width:30%">
-                <col style="width:20%">
-                <col style="width:10%">
-                <col style="width:15%">
-                <col style="width:15%">
-                <col style="width:10%">
-            </colgroup>
-
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Tejido</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Subtotal</th>
-                    <th></th>
-                </tr>
-            </thead>
-
-            <tbody id="productos-tabla"></tbody>
-        </table>
-
-        <button type="button" class="btn btn-secondary mt-3" onclick="addProducto()">➕ Añadir producto</button>
-
-        <!-- FACTURACIÓN -->
-        <h5 class="section-title mt-4">Facturación</h5>
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label>Precio</label>
-                <input type="number" step="0.01" name="Precio" id="precioInput" class="form-control">
-            </div>
-            <div class="col-md-6">
-                <label>Precio factura</label>
-                <input type="number" step="0.01" name="Precio_factura" id="facturaInput" class="form-control">
+        <div class="card mb-3">
+            <div class="card-header">📋 Datos del cliente</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label>Cliente *</label>
+                        <input type="text" name="Cliente" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Teléfono *</label>
+                        <input type="text" name="Telefono" class="form-control" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label>Club</label>
+                        <input type="text" name="Club" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Fecha estimada de entrega</label>
+                        <input type="date" name="Fecha_entrega_estimada" class="form-control" value="{{ fecha_hoy }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label>Fecha de entrada</label>
+                        <input type="date" name="Fecha_entrada" class="form-control" value="{{ fecha_hoy }}">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label>Comentarios</label>
+                        <textarea name="Comentarios" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- TOTALES Y FORMA DE PAGO -->
-        <div class="row mt-3 align-items-end">
-            <div class="col-md-4">
-                <h4 class="total-pedido mb-0">
-                    Total pedido: <span id="totalPedido">0.00€</span>
-                </h4>
-            </div>
-            <div class="col-md-4">
-                <label>Forma de pago</label>
-                <select name="Forma_pago" class="form-select theme-select">
-                    <option value="">— Seleccionar —</option>
-                    <option value="transferencia">Transferencia</option>
-                    <option value="bizum">Bizum</option>
-                    <option value="efectivo">Efectivo</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label>Pago adelantado</label>
-                <input type="number" step="0.01" name="Pago_adelantado" class="form-control" 
-                       placeholder="0.00">
+        <div class="card mb-3">
+            <div class="card-header">📊 Estados</div>
+            <div class="card-body">
+                {% for estado in estados %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Estados" value="{{ estado }}" id="estado_{{ forloop.counter }}">
+                    <label class="form-check-label" for="estado_{{ forloop.counter }}">{{ estado }}</label>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
-        <div class="mt-3" style="max-width:260px;">
-            <label class="fw-bold destino-label">Enviar total automáticamente a:</label>
-            <select id="destinoTotal" name="DestinoTotal" class="form-select theme-select">
-                <option value="">— No aplicar —</option>
-                <option value="precio">Precio</option>
-                <option value="precio_factura">Precio factura</option>
-            </select>
+        <div class="card mb-3">
+            <div class="card-header">📦 Productos</div>
+            <div class="card-body">
+                <table class="table" id="productosTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Tejido</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productosBody">
+                    </tbody>
+                </table>
+                <button type="button" class="btn btn-sm btn-primary" onclick="agregarProducto()">➕ Añadir producto</button>
+            </div>
         </div>
 
-        <!-- BOTONES -->
-        <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-primary">Guardar</button>
+        <div class="card mb-3">
+            <div class="card-header">💰 Facturación</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <label>Precio</label>
+                        <input type="text" name="Precio" class="form-control" id="totalPedido" readonly>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label>Precio factura</label>
+                        <input type="text" name="Precio_factura" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label>Total pedido: <span id="totalDisplay">0.00</span>€</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <label>Forma de pago</label>
+                        <select name="Forma_pago" class="form-control">
+                            <option value="">— Seleccionar —</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Bizum">Bizum</option>
+                            <option value="Efectivo">Efectivo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label>Pago adelantado</label>
+                        <input type="number" name="Pago_adelantado" class="form-control" step="0.01" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">💾 Guardar</button>
             <a href="/pedidos/" class="btn btn-secondary">Cancelar</a>
         </div>
-
     </form>
-
-    <!-- Plantillas ocultas -->
-    <div id="plantilla-productos" style="display:none;">
-        <select class="form-control">
-            <option value="">— Seleccionar producto —</option>
-            {% for prod in productos_disponibles %}
-            <option value="{{ prod }}">{{ prod }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div id="plantilla-tejidos" style="display:none;">
-        <select class="form-control">
-            <option value="">— Seleccionar tejido —</option>
-            {% for tejido in tejidos_disponibles %}
-            <option value="{{ tejido }}">{{ tejido }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
 </div>
 
-<style>
-.section-title,
-.destino-label,
-.total-pedido {
-    color: var(--text-color);
-}
-
-.theme-select,
-.table-detail select.form-control,
-.table-detail input.form-control,
-.form-control {
-    background: var(--bg-secondary);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-.estados-box label {
-    display: inline-block;
-    margin-right: 15px;
-    margin-bottom: 8px;
-    color: var(--text-color);
-}
-
-.table-detail { 
-    table-layout: fixed; 
-    background: var(--card-color);
-    color: var(--text-color);
-}
-.table-detail td, .table-detail th { 
-    padding: 6px; 
-    vertical-align: middle;
-    background: var(--card-color);
-    color: var(--text-color);
-    border-color: var(--border-color);
-}
-.table-detail thead th {
-    background: var(--bg-secondary);
-    font-weight: 600;
-}
-.table-detail .subtotal { 
-    background: transparent !important; 
-    border: none !important; 
-    text-align: right; 
-    color: var(--text-color);
-}
-</style>
+<!-- Templates ocultos para productos -->
+<template id="productoTemplate">
+    <tr class="producto-row">
+        <td>
+            <select name="producto_nombre_{index}" class="form-control producto-nombre">
+                <option value="">— Seleccionar producto —</option>
+                {% for prod in productos_disponibles %}
+                <option value="{{ prod }}">{{ prod }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>
+            <select name="producto_tejido_{index}" class="form-control producto-tejido">
+                <option value="">— Seleccionar tejido —</option>
+                {% for tejido in tejidos_disponibles %}
+                <option value="{{ tejido }}">{{ tejido }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>
+            <input type="number" name="producto_cantidad_{index}" class="form-control producto-cantidad" step="1" value="0" min="0">
+        </td>
+        <td>
+            <input type="number" name="producto_precio_{index}" class="form-control producto-precio" step="0.01" value="0" min="0">
+        </td>
+        <td class="producto-subtotal">0.00€</td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarProducto(this)">🗑️</button>
+        </td>
+    </tr>
+</template>
 
 <script>
-let index = 0;
-const tabla = document.getElementById("productos-tabla");
-const totalPedido = document.getElementById("totalPedido");
-const precioInput = document.getElementById("precioInput");
-const facturaInput = document.getElementById("facturaInput");
-const destinoSelect = document.getElementById("destinoTotal");
+let productoIndex = 0;
 
-function addProducto() {
-    const selectProdOrig = document.querySelector("#plantilla-productos select");
-    const selectTejidoOrig = document.querySelector("#plantilla-tejidos select");
+function agregarProducto() {
+    const template = document.getElementById('productoTemplate');
+    const tbody = document.getElementById('productosBody');
+    const row = template.content.cloneNode(true);
     
-    if (!selectProdOrig || !selectTejidoOrig) return;
-
-    const selectProd = selectProdOrig.cloneNode(true);
-    selectProd.name = `producto_nombre_${index}`;
-
-    const selectTejido = selectTejidoOrig.cloneNode(true);
-    selectTejido.name = `producto_tejido_${index}`;
-
-    tabla.insertAdjacentHTML("beforeend", `
-        <tr class="producto-item">
-            <td><input type="hidden" name="producto_index_${index}" value="${index}"></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-    `);
-
-    const fila = tabla.querySelector("tr:last-child");
-    fila.cells[0].innerHTML = '';
-    fila.cells[0].appendChild(selectProd);
-    fila.cells[1].appendChild(selectTejido);
-    fila.cells[2].innerHTML = `<input name="producto_cantidad_${index}" class="cantidad form-control" type="number" min="1" value="1">`;
-    fila.cells[3].innerHTML = `<input name="producto_precio_${index}" class="precio form-control" type="number" min="0" step="0.01" value="0">`;
-    fila.cells[4].innerHTML = `<input class="subtotal form-control" readonly value="0">`;
-    fila.cells[5].innerHTML = `<button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); calcularTotales();">X</button>`;
-
-    index++;
+    // Reemplazar {index} con el índice actual
+    row.querySelectorAll('[name*="{index}"]').forEach(el => {
+        el.name = el.name.replace('{index}', productoIndex);
+    });
+    
+    tbody.appendChild(row);
+    productoIndex++;
 }
 
-function calcularTotales() {
+function eliminarProducto(btn) {
+    btn.closest('tr').remove();
+    calcularTotal();
+}
+
+// Calcular subtotales y total
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('producto-cantidad') || e.target.classList.contains('producto-precio')) {
+        const row = e.target.closest('tr');
+        const cantidad = parseFloat(row.querySelector('.producto-cantidad').value) || 0;
+        const precio = parseFloat(row.querySelector('.producto-precio').value) || 0;
+        const subtotal = cantidad * precio;
+        
+        row.querySelector('.producto-subtotal').textContent = subtotal.toFixed(2) + '€';
+        calcularTotal();
+    }
+});
+
+function calcularTotal() {
     let total = 0;
-    tabla.querySelectorAll(".producto-item").forEach(row => {
-        const cant = parseFloat(row.querySelector(".cantidad").value) || 0;
-        const precio = parseFloat(row.querySelector(".precio").value) || 0;
-        const subtotal = cant * precio;
-        row.querySelector(".subtotal").value = subtotal.toFixed(2);
-        total += subtotal;
+    document.querySelectorAll('.producto-row').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('.producto-cantidad').value) || 0;
+        const precio = parseFloat(row.querySelector('.producto-precio').value) || 0;
+        total += cantidad * precio;
     });
-    totalPedido.innerText = total.toFixed(2) + "€";
-
-    const destino = destinoSelect.value;
-    precioInput.value = "";
-    facturaInput.value = "";
-
-    if (destino === "precio") {
-        precioInput.value = total.toFixed(2);
-    } else if (destino === "precio_factura") {
-        facturaInput.value = total.toFixed(2);
-    }
+    
+    document.getElementById('totalDisplay').textContent = total.toFixed(2);
+    document.getElementById('totalPedido').value = total.toFixed(2);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.estado-exclusivo').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            if (this.checked) {
-                document.querySelectorAll('.estado-exclusivo').forEach(other => {
-                    if (other !== this) {
-                        other.checked = false;
-                    }
-                });
-            }
-        });
-    });
-});
-
-destinoSelect.addEventListener("change", calcularTotales);
-document.addEventListener("input", e => {
-    if (e.target.classList.contains("cantidad") || e.target.classList.contains("precio")) {
-        calcularTotales();
-    }
-});
+// Agregar primera fila al cargar
+agregarProducto();
 </script>
-
 {% endblock %}

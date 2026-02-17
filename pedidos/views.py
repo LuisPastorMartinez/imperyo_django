@@ -50,11 +50,11 @@ def pedidos_home(request):
     return render(request, "pedidos/home.html", {"pedidos": pedidos})
 # ======================================================
 # CREAR
-# ======================================================
+# ==================== PEDIDO_CREAR ====================
 @login_required
 def pedido_crear(request):
     db = get_firestore_client()
-
+    
     # === CARGAR PRODUCTOS ===
     productos_disponibles = []
     try:
@@ -103,7 +103,6 @@ def pedido_crear(request):
             cantidad_raw = request.POST.get(f"producto_cantidad_{index}", "").strip()
             precio_raw = request.POST.get(f"producto_precio_{index}", "").strip()
 
-            # Si todos están vacíos, saltar
             if not nombre and not tejido and not cantidad_raw and not precio_raw:
                 index += 1
                 continue
@@ -114,8 +113,8 @@ def pedido_crear(request):
                 cantidad = 0
 
             try:
-                precio_unitario = float(precio_raw) if precio_raw else 0
-            except ValueError:
+                precio_unitario = float(precio_raw) if precio_raw else 0  # ✅ CORREGIDO
+            except ValueError:  # ✅ CORREGIDO
                 precio_unitario = 0
 
             if nombre or tejido or cantidad > 0 or precio_unitario > 0:
@@ -154,33 +153,31 @@ def pedido_crear(request):
             "total_pedido": total_pedido,
         })
 
-            # 📢 NOTIFICACIÓN TELEGRAM - NUEVO PEDIDO
-    try:
-        from utils.notifications import enviar_telegram
-        import os
-        
-        bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
-        chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
-        
-        if bot_token and chat_id:
-            mensaje = f"""🔔 <b>NUEVO PEDIDO CREADO</b>
-
-📋 <b>ID:</b> {nuevo_id}
-👤 <b>Cliente:</b> {request.POST.get('Cliente', 'N/A')}
-🏢 <b>Club:</b> {request.POST.get('Club', 'N/A')}
-📱 <b>Teléfono:</b> {request.POST.get('Telefono', 'N/A')}
-📦 <b>Productos:</b> {len(productos)}
-💰 <b>Total:</b> {total_pedido}€
-📅 <b>Entrega:</b> {request.POST.get('Fecha_entrega_estimada', 'N/A')}
-
+        # 📢 NOTIFICACIÓN TELEGRAM - NUEVO PEDIDO
+        try:
+            from utils.notifications import enviar_telegram
+            import os
+            
+            bot_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+            chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+            
+            if bot_token and chat_id:
+                mensaje = f"""🔔 <b>NUEVO PEDIDO CREADO</b>
+📋 ID: {nuevo_id}
+👤 Cliente: {request.POST.get('Cliente', 'N/A')}
+🏢 Club: {request.POST.get('Club', 'N/A')}
+📱 Teléfono: {request.POST.get('Telefono', 'N/A')}
+📦 Productos: {len(productos)}
+💰 Total: {total_pedido}€
+📅 Entrega: {request.POST.get('Fecha_entrega_estimada', 'N/A')}
 #Pedido #{nuevo_id}"""
-            enviar_telegram(mensaje, bot_token, chat_id)
-    except Exception as e:
-        print(f"Error enviando Telegram nuevo pedido: {e}")
-
+                enviar_telegram(mensaje, bot_token, chat_id)
+        except Exception as e:
+            print(f"Error enviando Telegram nuevo pedido: {e}")
+        
         return redirect("/pedidos/")
 
-    estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado",                              "retirado", "trabajo terminado"]
+    estados = ["Nuevo", "diseño", "fabricacion", "trabajo iniciado", "pendiente", "cobrado", "retirado", "trabajo terminado"]
 
     return render(request, "pedidos/crear.html", {
         "pedido_id": nuevo_id,
@@ -189,7 +186,6 @@ def pedido_crear(request):
         "tejidos_disponibles": sorted(tejidos_disponibles),
         "fecha_hoy": date.today().isoformat(),
     })
-
 # ======================================================
 # EDITAR
 # ======================================================

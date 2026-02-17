@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 def enviar_telegram(mensaje, bot_token, chat_id):
     """
     Envía un mensaje a un grupo de Telegram.
+    
     Args:
         mensaje (str): Texto del mensaje.
         bot_token (str): Token del bot de Telegram.
